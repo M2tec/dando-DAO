@@ -4,6 +4,57 @@ import Gun from 'gun';
 import Signers from './Signers';
 import holdingHandsImage from '../assets/holding_hands.png'
 import proposalsImage from '../assets/proposals.jpg'
+import Footer from '../components/Footer';
+import MilestoneCard from "../components/MilestoneCard";
+import NavBar from '../components/NavBar';
+
+const milestones = [
+  {
+    id: "M1",
+    budget: 50000,
+    subject: "Release",
+    approvals: 0,
+    refusals: 0,
+    goveranaceName: "",
+    governanceAction: "Completed",
+    governancePayment: "500",
+    remaining: 0
+  },
+  {
+    id: "M2",
+    budget: 50000,
+    subject: "DNO operator fund",
+    approvals: 0,
+    refusals: 0,
+    governanceName: "Eligible nodes",
+    governanceAction: 6,
+    governancePayment: "500",
+    remaining: 48000
+  },
+  {
+    id: "M3",
+    budget: 30000,
+    subject: "Education",
+    approvals: 0,
+    refusals: 0,
+    governanceName: "Education tasks",
+    governanceAction: 10,
+    governancePayment: "600",
+    remaining: 48000
+  },
+  {
+    id: "M4",
+    budget: 69000,
+    subject: "Maintenance",
+    approvals: 0,
+    refusals: 0,
+    governanceName: "Maintenance proposals",
+    governanceAction: 6,
+    governancePayment: "700",
+    remaining: 48000
+  },
+];
+
 
 const Home = () => {
   const [members, setMembers] = useState({})
@@ -34,7 +85,7 @@ const Home = () => {
     });
 
     // url = url.replace("https://beta-preprod-wallet.", "https://dev-preprod-wallet.")
-    
+
     window.open(url, '_blank', 'location=yes,height=700,width=520,scrollbars=yes,status=yes');
   }
 
@@ -75,7 +126,7 @@ const Home = () => {
     setDaoTransactions({ ...getTransactions })
 
 
-    window.addEventListener('storage', () => {     
+    window.addEventListener('storage', () => {
       console.log("StorageEvent")
       setDaoInfo(JSON.parse(localStorage.getItem('daoInfo_0')) || {})
 
@@ -241,7 +292,7 @@ const Home = () => {
         },
         "getAddress": {
           "type": "getAddresses",
-        } 
+        }
       },
       "returnURLPattern": host + "/return-data?d={result}"
     }
@@ -538,10 +589,10 @@ const Home = () => {
     }
 
     // Add submit to the final signing. 
-    if (witnessKeyAmount == memberAmount -1) {
-      console.log (witnessKeyAmount, memberAmount)
+    if (witnessKeyAmount == memberAmount - 1) {
+      console.log(witnessKeyAmount, memberAmount)
 
-      gcscript["run"]["submit_2"]= 
+      gcscript["run"]["submit_2"] =
       {
         "type": "submitTxs",
         "namePattern": "Submitted Demo Transaction",
@@ -552,7 +603,7 @@ const Home = () => {
 
     // With all witnesskeys present abort
     if (witnessKeyAmount >= memberAmount) {
-      console.log ("Transaction finished")
+      console.log("Transaction finished")
       return
     }
 
@@ -600,96 +651,75 @@ const Home = () => {
     let proposalTx = daoTransactions[index]
 
     return (
-    <li className="list-group-item" key={index} >{proposal.type}
-      <div className="input-group mb-3">
-        <div className="input-group-prepend">
-          <span className="input-group-text" id="basic-addon1">@</span>
+      <li className="list-group-item" key={index} >{proposal.type}
+        <div className="input-group mb-3">
+          <div className="input-group-prepend">
+            <span className="input-group-text" id="basic-addon1">@</span>
+          </div>
+          <input type="text" onChange={(e) => handleProposalNameChange(e, index)} className="form-control" placeholder="Proposal name" defaultValue={proposal.name} aria-label="Username" aria-describedby="basic-addon1" />
         </div>
-        <input type="text" onChange={(e) => handleProposalNameChange(e, index)} className="form-control" placeholder="Proposal name" defaultValue={proposal.name} aria-label="Username" aria-describedby="basic-addon1" />
-      </div>
 
-      <div className="input-group mb-3">
-        <div className="input-group-prepend">
-          <span className="input-group-text" id="basic-addon1">Reciever address</span>
+        <div className="input-group mb-3">
+          <div className="input-group-prepend">
+            <span className="input-group-text" id="basic-addon1">Reciever address</span>
+          </div>
+          <input type="text" onChange={(e) => handleProposalAddressChange(e, index)} className="form-control" placeholder="Cardano address" defaultValue={proposal.address} aria-label="Username" aria-describedby="basic-addon1" />
         </div>
-        <input type="text" onChange={(e) => handleProposalAddressChange(e, index)} className="form-control" placeholder="Cardano address" defaultValue={proposal.address} aria-label="Username" aria-describedby="basic-addon1" />
-      </div>
 
-      <div className="input-group mb-3">
-        <div className="input-group-prepend">
-          <span className="input-group-text" id="basic-addon1">Details</span>
+        <div className="input-group mb-3">
+          <div className="input-group-prepend">
+            <span className="input-group-text" id="basic-addon1">Details</span>
+          </div>
+          <input type="text" onChange={(e) => handleProposalDetailsChange(e, index)} className="form-control" placeholder="" defaultValue={proposal.details} aria-label="Username" aria-describedby="basic-addon1" />
         </div>
-        <input type="text" onChange={(e) => handleProposalDetailsChange(e, index)} className="form-control" placeholder="" defaultValue={proposal.details} aria-label="Username" aria-describedby="basic-addon1" />
-      </div>
 
-      <div className="input-group mb-3">
-        <div className="input-group-prepend">
-          <span className="input-group-text" id="basic-addon1">Amount</span>
+        <div className="input-group mb-3">
+          <div className="input-group-prepend">
+            <span className="input-group-text" id="basic-addon1">Amount</span>
+          </div>
+          <input type="text" onChange={(e) => handleProposalAmountChange(e, index)} className="form-control" placeholder="" defaultValue={proposal.amount} aria-label="Amount" aria-describedby="basic-addon1" />
         </div>
-        <input type="text" onChange={(e) => handleProposalAmountChange(e, index)} className="form-control" placeholder="" defaultValue={proposal.amount} aria-label="Amount" aria-describedby="basic-addon1" />
-      </div>
 
-      <Signers {...{ proposalTx, members }} />
-      <a href="#" className="btn btn-primary m-2" onClick={(e) => handleAuthorizeProposal(e, index)}>Authorize</a>
-      <a href="#" className="btn btn-primary m-2" onClick={(e) => handleSignProposal(e, index)}>Sign</a>
-      <UnimatrixListener {...{
-        gun,
-        index,
-        unimatrixId: `${daoInfo.name}_${index}`,
-        members }} />
-    </li>)
+        <Signers {...{ proposalTx, members }} />
+        <a href="#" className="btn btn-primary m-2" onClick={(e) => handleAuthorizeProposal(e, index)}>Authorize</a>
+        <a href="#" className="btn btn-primary m-2" onClick={(e) => handleSignProposal(e, index)}>Sign</a>
+        <UnimatrixListener {...{
+          gun,
+          index,
+          unimatrixId: `${daoInfo.name}_${index}`,
+          members
+        }} />
+      </li>)
   }
   );
 
   return (
     <>
-      <div className="card">
-        <img className="card-img-top" src={holdingHandsImage} alt="Card image cap" />
-        <div className="card-body">
-          <h5 className="card-title">DAO creator</h5>
+      <NavBar />
 
-          <div className="input-group mb-3">
-            <div className="input-group-prepend">
-              <span className="input-group-text" id="basic-addon1">DAO name</span>
+      <div class="m-3">
+        <h1 class="text-3xl font-bold mb-0"><b>Dandelion-lite Governance</b></h1>
+        <p>Cardano decentralized server API's</p>
+
+        <div class="container-fluid m-0">
+          <div class="row gap-3">
+            <div class="card mb-3 p-3 w-auto bg-secondary border-0 rounded-0" >
+              <h4><b>ADA 2500.00</b></h4>
+              to be distributed in next batch.
             </div>
-            <input type="text" onChange={handleDaoNameChange} className="form-control" placeholder="" defaultValue={daoInfo.name} aria-label="DAOname" aria-describedby="basic-addon1" />
           </div>
+        </div>
 
-          <ul className="list-group">
-            {listMembers}
-            <a className="btn btn-primary mt-2" onClick={handleAddMember}>Add member</a>
-            <a className="btn btn-primary mt-2" onClick={resetMembers}>Reset</a>
-          </ul>
-          <a className="btn btn-primary m-3" onClick={handleCreateDAO}>Create DAO</a>
-
-          <div className="input-group mb-3">
-            <div className="input-group-prepend">
-              <span className="input-group-text" id="basic-addon1">DAO address</span>
-            </div>
-            <input type="text" onChange={handleDaoAddressChange} className="form-control" placeholder="" defaultValue={daoInfo.address} aria-label="DAOname" aria-describedby="basic-addon1" />
+        <h2 class="font-bold mb-2"><b>Milestones Recap</b></h2>
+        <div class="container-fluid p-0">
+          <div class="row ">
+            {milestones.map((milestone) => (
+              <MilestoneCard key={milestone.id} milestone={milestone} />
+            ))}
           </div>
-
-          <div className="input-group mb-3">
-            <div className="input-group-prepend">
-              <span className="input-group-text" id="basic-addon1">Fund DAO</span>
-            </div>
-            <input type="text" onChange={handleDaoFundChange} className="form-control" placeholder="" defaultValue="100" aria-label="DAOname" aria-describedby="basic-addon1" />
-            <a className="btn btn-primary" onClick={fundDAOWallet}>Fund</a>
-          </div>
-
         </div>
       </div>
-
-      <div className="card mt-3">
-        <img className="card-img-top" src={proposalsImage} alt="Card image cap" />
-        <div className="card-body">
-          <h5 className="card-title">Proposal</h5>
-          <ul className="list-group">
-            {listProposals(proposals, daoTransactions)}
-            <a className="btn btn-primary mt-2" onClick={handleAddProposal}>Add proposal</a>
-          </ul>
-        </div>
-      </div>
+      <Footer />
     </>
 
   )
