@@ -79,7 +79,7 @@ const MilestoneCard = ({ milestone }) => {
 
         <div class="d-flex align-items-start flex-column h-100">
 
-          <h1 className=""><b><u>{milestone.id}</u></b></h1>
+          <h1 className=""><a href={milestone.id} class="text-black"><b><u>{milestone.id}</u></b></a></h1>
 
           <div class="mb-3">{milestone.subject}</div>
 

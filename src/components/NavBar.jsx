@@ -7,10 +7,10 @@ const NavBar = () => {
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-              <li class="px-1 nav-item"><a class="nav-link text-white" href="#">Home</a></li>
-              <li class="px-1 nav-item"><a class="nav-link text-white" href="#">M2 Dandelion nodes</a></li>
-              <li class="px-1 nav-item"><a class="nav-link text-white" href="#">M3 Education</a></li>
-              <li class="px-1 nav-item"><a class="nav-link text-white" href="#">M4 Maintanance</a></li>
+              <li class="px-1 nav-item"><a class="nav-link text-white" href="/">Home</a></li>
+              <li class="px-1 nav-item"><a class="nav-link text-white" href="m2">M2 Dandelion nodes</a></li>
+              <li class="px-1 nav-item"><a class="nav-link text-white" href="m3">M3 Education</a></li>
+              <li class="px-1 nav-item"><a class="nav-link text-white" href="m4">M4 Maintanance</a></li>
             </ul>
           </div>
         </div>
