@@ -4,10 +4,6 @@ const MilestoneCard = ({ milestone }) => {
     return (
 
       <div>
-        <h1 className=""><b><u>{milestone.id}</u></b></h1>
-
-        <div class="mb-3">{milestone.subject}</div>
-
         <div class="text-white">
           <div>Milestone Budget: </div>
           <h3><b>ADA {milestone.budget.toLocaleString()}</b></h3>
@@ -16,6 +12,28 @@ const MilestoneCard = ({ milestone }) => {
     )
 
   }
+  function Voting({ status, approvals, refusals }) {
+    if (status == "Completed") {
+      return (<div></div>)
+    }
+
+    return (
+      <div class="container mb-3">
+        <div class="row gap-3">
+          <div class="col bg-light p-3">
+            <h2><b>{approvals}</b></h2>
+            <div>approvals</div>
+          </div>
+
+          <div class="col bg-light p-3">
+            <h2><b>{refusals}</b></h2>
+            <div>refusals</div>
+          </div>
+
+        </div>
+      </div>
+    );
+  };
 
   function GovernanaceStatus({ name, status, payment }) {
 
@@ -61,6 +79,15 @@ const MilestoneCard = ({ milestone }) => {
 
         <div class="d-flex align-items-start flex-column h-100">
 
+          <h1 className=""><b><u>{milestone.id}</u></b></h1>
+
+          <div class="mb-3">{milestone.subject}</div>
+
+          <Voting 
+            status={milestone.governanceAction}
+            approvals={milestone.approvals}
+            refusals={milestone.refusals}
+            />
 
           <Budget
             budget={milestone.budget}
