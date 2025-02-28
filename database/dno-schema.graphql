@@ -1,0 +1,15 @@
+type Dno {
+  id: ID!
+  firstName: String @search
+  lastName: String @search
+  address: String
+  nodeUrl: String
+  uptimes: Uptime
+}
+
+type Uptime {
+  id: ID!
+  uptimeData: [String]
+  dnoId: Int
+  dno: Dno
+}

@@ -1,0 +1,39 @@
+mutation{ addDno(input: [{
+  firstName: "Adriano", 
+  lastName: "Fiorenza"
+}])
+}
+
+
+mutation { addDno(input: [
+  { 
+    firstName: "Adriano", 
+    lastName: "Fiorenza", 
+    address: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    nodeUrl: "sunflower.m2tec.nl"
+    uptimes: { uptimeData: ["001011001110010101", "000100111111111111", "00011111111111111"]}
+  },
+    { 
+    firstName: "Roberto", 
+    lastName: "Moreno", 
+    address: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    nodeUrl: "og.dandelion.io"
+    uptimes: { uptimeData: ["00111111110010101", "00010011111111111", "00011111111111111"]}
+    },
+    { 
+    firstName: "Q", 
+    lastName: "Uazar", 
+    address: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    nodeUrl: "dandelion.quazar.usa"
+    uptimes: { uptimeData: ["001011001111111111", "000100001111111111111", "0001000011111111111111"]}
+    }
+])
+{
+    dno {
+      id
+      firstName
+      lastName  
+      uptimes { uptimeData}
+    }
+  }
+}

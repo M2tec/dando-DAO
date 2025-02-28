@@ -11,13 +11,18 @@
     "link-unimatrix": "npm link @gamechanger-finance/unimatrix"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.1",
     "@emurgo/cardano-serialization-lib-browser": "^13.2.1",
     "@gamechanger-finance/gc": "^0.1.0",
     "@gamechanger-finance/unimatrix": "^1.0.3",
     "@mdi/font": "^7.4.47",
     "bip39": "^3.1.0",
     "cross-fetch": "^4.0.0",
+    "graphql": "^16.10.0",
+    "graphql-compose": "^9.1.0",
     "gun": "^0.2020.1240",
+    "i": "^0.3.7",
+    "npm": "^11.1.0",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",

@@ -1,0 +1,23 @@
+query {
+  queryDno(filter: {
+    firstName: {anyofterms: "Adriano"},
+  }) {
+firstName
+lastName
+  }
+}
+
+
+query { queryDno { firstName }
+}
+
+query {
+  queryPost(filter: {
+    id: ["0x1", "0x2", "0x3", "0x4"],
+  }) {
+    id
+    title
+    text
+    datePublished
+  }
+}
