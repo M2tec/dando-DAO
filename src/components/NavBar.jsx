@@ -94,8 +94,11 @@ const NavBar = () => {
 
       return (
       <>
+      <div>
         <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
         <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
+      
+      </div>
       </>
       )
     }
