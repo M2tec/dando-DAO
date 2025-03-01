@@ -23,7 +23,10 @@ const Data = () => {
     
     if (Object.keys(resultObj).length !== 0) {
 
-      if (resultObj.exports.userData) {
+      let returnDataKey = Object.keys(resultObj.exports)[0] 
+      console.log(returnDataKey)
+
+      if (returnDataKey == "userData") {
         let userdata = resultObj.exports.userData
         let pubKey = userdata.addressInfo.paymentKeyHash
         let stakeKey = userdata.addressInfo.stakingKeyHash
@@ -42,7 +45,7 @@ const Data = () => {
         }
 
         
-      } else if (resultObj.exports.daoWalletData) {
+      } else if (returnDataKey == "daoWalletData") {
 
         let key = Object.keys(resultObj.exports.daoWalletData.getAddress)
         // console.log(key)
@@ -58,21 +61,25 @@ const Data = () => {
           localStorage.setItem("daoInfo_0", JSON.stringify(daoInfo))
         }
 
-      } else if (resultObj.exports.dnoWalletData) {
+      } else if (returnDataKey == "dnoWalletData") {
 
-        let key = Object.keys(resultObj.exports.daoWalletData.getAddress)
-        // console.log(key)
-        let address = resultObj.exports.daoWalletData.getAddress[key].address
+        console.log(resultObj.exports.dnoWalletData)
+
+        let dnoData = resultObj.exports.dnoWalletData
+        // let key = Object.keys(resultObj.exports.dnoWalletData.getAddress)
+        // // console.log(key)
+        let address = dnoData.address
         console.log(address)
 
 
-        let daoInfo = JSON.parse(localStorage.getItem("daoInfo_0"));
+        // let dnoInfo = JSON.parse(localStorage.getItem("dnoInfo_0"));
 
-        if (daoInfo !== null) {
-          daoInfo.address = address
+        // if (dnoInfo !== null) {
+        //   dnoInfo.address = address
 
-          localStorage.setItem("daoInfo_0", JSON.stringify(daoInfo))
-        }
+        //   localStorage.setItem("dnoInfo_0", JSON.stringify(dnoInfo))
+        // }
+        localStorage.setItem("login_0", JSON.stringify(address))
 
       }  else {
         console.log(resultObj.exports)
@@ -81,7 +88,7 @@ const Data = () => {
     }
   }, [resultObj])
 
-  window.close()
+  // window.close()
   return (<h1>Results</h1>)
 };
 

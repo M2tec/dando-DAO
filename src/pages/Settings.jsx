@@ -4,7 +4,26 @@ import NavBar from '../components/NavBar';
 
 
 const Settings = () => {
+  const [walletAddress, setWalletAddress] = useState("")
 
+  useEffect(() => {
+
+
+    let walletAddress = JSON.parse(localStorage.getItem("login_0"));
+
+    if (walletAddress === null) {
+      walletAddress = ""
+    }
+
+    setWalletAddress(walletAddress)
+
+    window.addEventListener('storage', () => {
+      console.log("StorageEvent")
+      setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
+    });
+
+
+  }, []);
 
   return (
     <>
@@ -20,19 +39,19 @@ const Settings = () => {
               to be distributed in next batch.
             </div>
 
-            <div class="">
+            <div className="">
                <h2> Cardano Address</h2>
-               addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt
+               {walletAddress}
             </div>
 
             <form>
-              <div class="form-group mb-2">
-                <label for="exampleFormControlInput1">Name</label>
-                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Nike Hoskinson" />
+              <div className="form-group mb-2">
+                <label htmlFor="exampleFormControlInput1">Name</label>
+                <input type="text" className="form-control" id="exampleFormControlInput1" placeholder="Nike Hoskinson" />
               </div>
-              <div class="form-group mb-2">
-                <label for="exampleFormControlInput1">Node Url</label>
-                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="https://server1.dandelion.link" />
+              <div className="form-group mb-2">
+                <label htmlFor="exampleFormControlInput1">Node Url</label>
+                <input type="text" className="form-control" id="exampleFormControlInput1" placeholder="https://server1.dandelion.link" />
               </div>
 
             </form>

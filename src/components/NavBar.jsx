@@ -1,12 +1,34 @@
-import { handleGC } from "./Utility";
+import { isEmpty, handleGC } from "./Utility";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const NavBar = () => {
+  const [walletAddress, setWalletAddress] = useState("")
+
+  useEffect(() => {
+
+
+    let walletAddress = JSON.parse(localStorage.getItem("login_0"));
+
+    if (walletAddress === null) {
+      walletAddress = ""
+    }
+
+    setWalletAddress(walletAddress)
+
+    window.addEventListener('storage', () => {
+      console.log("StorageEvent")
+      setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
+    });
+
+
+  }, []);
+
 
   function handleLogin() {
 
     let host = location.protocol + '//' + location.host
-    
+
     const gcscript =
     {
       "title": "Connect with GC",
@@ -41,7 +63,42 @@ const NavBar = () => {
 
     handleGC(gcscript);
 
-    
+
+  }
+
+  function Connect(props) {
+
+    // console.log("Props", props)
+    let wa = props.walletAddress
+
+    console.log(wa)
+    if (wa == "") {
+      return (<></>)
+    }
+
+    if (wa == "") {
+
+      return (
+        <>
+          <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
+        </>
+      )
+
+    } else {
+
+      let firstWA = wa.slice(0,6)
+      let lastWA =  wa.slice(-6)
+
+      wa = firstWA + "..." + lastWA
+
+      return (
+      <>
+        <Link className="nav-link text-white px-3" to="/settings">Settings</Link>
+        <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
+      </>
+      )
+    }
+
   }
 
   return (
@@ -59,8 +116,8 @@ const NavBar = () => {
           </ul>
 
         </div>
-        <Link className="nav-link text-white px-3" to="/settings">Settings</Link>
-        <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Login</button>
+        <Connect
+          walletAddress={walletAddress} />
       </div>
     </nav>
   );
