@@ -8,7 +8,7 @@ const DNOUptimeDisplay = () => {
 
         const fetchData = async () => {
 
-            let gqlQuery = { query: "query { queryDno { id firstName lastName address nodeUrl uptimes { uptimeData }}}" }
+            let gqlQuery = { query: "query { queryDno { id name address nodeUrl uptimes { uptimeData }}}" }
             let gqlData = await handleQuery(gqlQuery)
 
             // console.log(gqlData)
@@ -27,46 +27,42 @@ const DNOUptimeDisplay = () => {
         let gq = `
             mutation { addDno(input: [
             { 
-                firstName: "Adriano", 
-                lastName: "Fiorenza", 
-                address: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+                name: "Adriano Fiorenza", 
+                address: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m"
                 nodeUrl: "sunflower.m2tec.nl"
                 uptimes: { uptimeData: ["001011001110010101", "000100111111111111", "00011111111111111"]}
             },
                 { 
-                firstName: "Roberto", 
-                lastName: "Moreno", 
-                address: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+                name: "Roberto Moreno", 
+                address: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6"
                 nodeUrl: "og.dandelion.io"
                 uptimes: { uptimeData: ["00111111110010101", "00010011111111111", "00011111111111111"]}
                 },
                 { 
-                firstName: "Q", 
-                lastName: "Uazar", 
-                address: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+                name: "QUazar", 
+                address: "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"
                 nodeUrl: "dandelion.quazar.usa"
                 uptimes: { uptimeData: ["001011001111111111", "000100001111111111111", "0001000011111111111111"]}
                 }
-            ])
+            ], upsert: true )
             {
                 dno {
-                id
-                firstName
-                lastName  
-                uptimes { uptimeData}
+                    id
+                    name
+                    uptimes { uptimeData}
                 }
             }
             }
 `
 
-        gqlQuery = { query: gq.replace(/\n/g, ' ') };
+        let gqlQuery = { query: gq.replace(/\n/g, ' ') };
         // const gqlQuery = { query: "query { queryDno { firstName lastName address nodeUrl uptimes { uptimeData }}}"}
 
         const fetchData = async () => {
 
             let gqlData = await handleQuery(gqlQuery)
-
             console.log(gqlData)
+
         }
 
         fetchData()
@@ -74,7 +70,7 @@ const DNOUptimeDisplay = () => {
     }
 
     const ProcessMonth = ({ uptimeData }) => [...uptimeData].map((item, index) => {
-        if (item == 0) {
+        if (item == 1) {
             return (
                 <div key={index} className="col p-0 m-0">
                     <div className='bg-success m-0 p-0'><br /></div>
@@ -100,36 +96,44 @@ const DNOUptimeDisplay = () => {
             return (<></>)
         }
 
-
+        console.log("dnoList", dnoList)
         const DnoItems = dnoList.map((item, index) => // { console.log("item", item.uptimes.uptimeData[0])}
+        {
+            // console.log(item.uptimes.uptimeData[0])
 
-            <div key={index} className='row m-0 mb-2'>
+        if (item.uptimes == null) {
+            let up = {uptimeData : ["111","000","000"]}
+            item["uptimes"] = up
+                }
+         return (
+         <div key={index} className='row m-0 mb-2'>
                 <div className='col-3 px-0'>
                     <div className='d-flex justify-content-between'>
-                        <div className='mt-1'>{item.firstName} {item.lastName}</div>
+                        <div className='mt-1'>{item.name}</div>
                     </div>
                 </div>
                 <div className='col-3 px-1'>
-                    <div className="row m-0 mt-1">
+                    <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
                             uptimeData={item.uptimes.uptimeData[0]} />
                     </div>
                 </div>
                 <div className='col-3 px-1'>
-                    <div className="row m-0 mt-1">
+                    <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
                             uptimeData={item.uptimes.uptimeData[1]} />
                     </div>
                 </div>
                 <div className='col-3 px-1'>
-                    <div className="row m-0 mt-1">
+                    <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
                             uptimeData={item.uptimes.uptimeData[2]} />
                     </div>
                 </div>
             </div>
-        );
-
+         )
+        
+    })
         // console.log(DnoItems)
 
         return (

@@ -66,19 +66,10 @@ const Data = () => {
         console.log(resultObj.exports.dnoWalletData)
 
         let dnoData = resultObj.exports.dnoWalletData
-        // let key = Object.keys(resultObj.exports.dnoWalletData.getAddress)
-        // // console.log(key)
+  
         let address = dnoData.address
         console.log(address)
 
-
-        // let dnoInfo = JSON.parse(localStorage.getItem("dnoInfo_0"));
-
-        // if (dnoInfo !== null) {
-        //   dnoInfo.address = address
-
-        //   localStorage.setItem("dnoInfo_0", JSON.stringify(dnoInfo))
-        // }
         localStorage.setItem("login_0", JSON.stringify(address))
 
       }  else {
@@ -88,7 +79,7 @@ const Data = () => {
     }
   }, [resultObj])
 
-  // window.close()
+  window.close()
   return (<h1>Results</h1>)
 };
 

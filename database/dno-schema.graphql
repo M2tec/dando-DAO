@@ -1,8 +1,7 @@
 type Dno {
   id: ID!
-  firstName: String @search
-  lastName: String @search
-  address: String
+  name: String @search
+  address: String! @id
   nodeUrl: String
   uptimes: Uptime
 }

@@ -1,6 +1,7 @@
 import { isEmpty, handleGC } from "./Utility";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Gear } from "react-bootstrap-icons";
 
 const NavBar = () => {
   const [walletAddress, setWalletAddress] = useState("")
@@ -71,7 +72,7 @@ const NavBar = () => {
     // console.log("Props", props)
     let wa = props.walletAddress
 
-    console.log(wa)
+    // console.log(wa)
     if (wa == "") {
       return (<></>)
     }
@@ -93,7 +94,7 @@ const NavBar = () => {
 
       return (
       <>
-        <Link className="nav-link text-white px-3" to="/settings">Settings</Link>
+        <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
         <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
       </>
       )
