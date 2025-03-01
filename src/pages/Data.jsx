@@ -58,6 +58,22 @@ const Data = () => {
           localStorage.setItem("daoInfo_0", JSON.stringify(daoInfo))
         }
 
+      } else if (resultObj.exports.dnoWalletData) {
+
+        let key = Object.keys(resultObj.exports.daoWalletData.getAddress)
+        // console.log(key)
+        let address = resultObj.exports.daoWalletData.getAddress[key].address
+        console.log(address)
+
+
+        let daoInfo = JSON.parse(localStorage.getItem("daoInfo_0"));
+
+        if (daoInfo !== null) {
+          daoInfo.address = address
+
+          localStorage.setItem("daoInfo_0", JSON.stringify(daoInfo))
+        }
+
       }  else {
         console.log(resultObj.exports)
       }

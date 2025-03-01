@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const MilestoneCard = ({ milestone }) => {
 
   function Budget({ budget }) {
@@ -79,7 +81,7 @@ const MilestoneCard = ({ milestone }) => {
 
         <div className="d-flex align-items-start flex-column h-100">
 
-          <h1 className=""><a href={milestone.id} className="text-black"><b><u>{milestone.id}</u></b></a></h1>
+          <h1 className=""><Link to={milestone.id} className="text-black"><b><u>{milestone.id}</u></b></Link></h1>
 
           <div className="mb-3">{milestone.subject}</div>
 

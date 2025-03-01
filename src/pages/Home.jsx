@@ -7,6 +7,7 @@ import proposalsImage from '../assets/proposals.jpg'
 import Footer from '../components/Footer';
 import MilestoneCard from "../components/MilestoneCard";
 import NavBar from '../components/NavBar';
+import { handleGC } from '../components/Utility';
 
 const milestones = [
   {
@@ -73,21 +74,7 @@ const Home = () => {
   const defaultMemberData = { 0: { type: "Controller", name: "John", address: "", pubKey: "", stakeKey: "" } };
   const defaultProposalData = { 0: { type: "Governance", name: "", details: "", address: "", amount: "", txHashes: [] } };
 
-  async function handleGC(gcscript) {
 
-    console.log(JSON.stringify(gcscript))
-
-    let url = await gc.encode.url({
-      input: JSON.stringify(gcscript), // GCScript is pure JSON code, supported on all platforms
-      apiVersion: '2', //APIV2
-      network: 'preprod', // mainnet or preprod
-      encoding: 'gzip' //suggested, default message encoding/compression 
-    });
-
-    // url = url.replace("https://beta-preprod-wallet.", "https://dev-preprod-wallet.")
-
-    window.open(url, '_blank', 'location=yes,height=700,width=520,scrollbars=yes,status=yes');
-  }
 
   useEffect(() => {
 

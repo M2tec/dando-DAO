@@ -11,8 +11,8 @@ const M2NodeOperators = () => {
     <>
       <NavBar />
       <div className="m-3">
-      <h1 className="text-3xl font-bold mb-0"><b>Dandelion-lite Governance</b></h1>
-        <p>Cardano decentralized server API's</p>
+      <h1 className="text-3xl font-bold mb-0"><b>Dandelion-lite Node Operator dashboard</b></h1>
+        <p>Uptime display</p>
 
         <div className="container-fluid m-0">
           <div className="row gap-3">
@@ -25,9 +25,7 @@ const M2NodeOperators = () => {
         </div>
         </div>
       <Footer />
-
     </>
-
   )
 };
 
