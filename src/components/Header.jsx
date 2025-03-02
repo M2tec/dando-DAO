@@ -1,9 +1,9 @@
 import { isEmpty, handleGC } from "./Utility";
-import { Link } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Gear } from "react-bootstrap-icons";
 
-const NavBar = () => {
+const Header = () => {
   const [walletAddress, setWalletAddress] = useState("")
 
   useEffect(() => {
@@ -67,45 +67,37 @@ const NavBar = () => {
 
   }
 
-  // function Connect(props) {
+  function Connect({ walletAddress }) {
 
-  //   // console.log("Props", props)
-  //   let wa = props.walletAddress
+    // console.log("Props", props)
+    // let wa = props.walletAddress
 
-  //   // console.log(wa)
-  //   if (wa == "") {
-  //     return (<></>)
-  //   }
+    console.log("walletAddress", walletAddress)
+    if (walletAddress == "") {
+      return (
+        <>
+          <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
+        </>)
+    } else {
+      let firstWA = walletAddress.slice(0,6)
+      let lastWA =  walletAddress.slice(-6)
 
-  //   if (wa == "") {
+      let wa = firstWA + "..." + lastWA
 
-  //     return (
-  //       <>
-  //         <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
-  //       </>
-  //     )
+      return (
 
-  //   } else {
+        <div>
+          <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
+          <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
+  
+        </div>
+        )
+    }
 
-  //     let firstWA = wa.slice(0,6)
-  //     let lastWA =  wa.slice(-6)
-
-  //     wa = firstWA + "..." + lastWA
-
-  //     return (
-  //     <>
-  //     <div>
-  //       <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
-  //       <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
-      
-  //     </div>
-  //     </>
-  //     )
-  //   }
-
-  // }
+  }
 
   return (
+    <>
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container-fluid">
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,19 +109,20 @@ const NavBar = () => {
             <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m2">M2 Dandelion nodes</Link></li>
             <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m3">M3 Education</Link></li>
             <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m4">M4 Maintanance</Link></li>
+            {/* <li className="px-1 nav-item"><a className="nav-link text-white" href="/">Home</a></li>
+            <li className="px-1 nav-item"><a className="nav-link text-white" href="/m2">M2 Dandelion nodes</a></li>
+            <li className="px-1 nav-item"><a className="nav-link text-white" href="/m3">M3 Education</a></li>
+            <li className="px-1 nav-item"><a className="nav-link text-white" href="/m4">M4 Maintanance</a></li> */}
           </ul>
 
         </div>
-      
-          {/*  <Connect walletAddress={walletAddress} */}
-                <div>
-        <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
-        <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button"></button>
-      
-      </div>
+        <Connect
+          walletAddress={walletAddress} />
       </div>
     </nav>
+    {/* <Outlet /> */}
+    </>
   );
 };
 
-export default NavBar;
+export default Header;

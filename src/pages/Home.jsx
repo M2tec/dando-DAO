@@ -6,7 +6,7 @@ import holdingHandsImage from '../assets/holding_hands.png'
 import proposalsImage from '../assets/proposals.jpg'
 import Footer from '../components/Footer';
 import MilestoneCard from "../components/MilestoneCard";
-import NavBar from '../components/NavBar';
+import NavBar from '../components/Header';
 import { handleGC } from '../components/Utility';
 
 const milestones = [

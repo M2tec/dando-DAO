@@ -30,5 +30,5 @@ services:
     ports:
       - "8180:80"
     volumes:
-    - ./config/nginx.conf:/etc/nginx/nginx.conf:ro      
+    - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro      
     restart: always

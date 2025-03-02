@@ -27,12 +27,8 @@ export function isEmpty(obj) {
 export async function handleQuery(gquery) {
 
     let gqlBody = JSON.stringify(gquery)
-    // console.log(gqlBody)
-    console.log("API URL: ", graphUrl)
 
-    // graphUrl = "http://localhost:8080/graphql";
-        
-    // console.log("override", graphUrl)
+    console.log("API URL: ", graphUrl)
     try {
         const response = await fetch(graphUrl,
             {

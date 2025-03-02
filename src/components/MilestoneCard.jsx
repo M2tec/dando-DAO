@@ -81,7 +81,7 @@ const MilestoneCard = ({ milestone }) => {
 
         <div className="d-flex align-items-start flex-column h-100">
 
-          <h1 className=""><Link to={milestone.id} className="text-black"><b><u>{milestone.id}</u></b></Link></h1>
+          <h1 className=""><Link to={milestone.id.toLowerCase()} className="text-black"><b><u>{milestone.id}</u></b></Link></h1>
 
           <div className="mb-3">{milestone.subject}</div>
 

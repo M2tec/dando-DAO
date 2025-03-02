@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Footer from '../components/Footer';
-import NavBar from '../components/NavBar';
+import NavBar from '../components/Header';
 import { handleQuery, isEmpty, DelayedInput, useDebounce } from '../components/Utility';
 
 const Settings = () => {
