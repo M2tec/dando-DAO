@@ -15,7 +15,7 @@ RUN apk add --no-cache  python3 \
 RUN mkdir /dando
 WORKDIR /dando
 
-COPY ./package*.json ./
+COPY ./package.json ./
 COPY ./vite.config.js ./
 COPY ./index.html ./
 COPY ./src ./src
@@ -34,5 +34,5 @@ COPY --from=vite-build /dando/dist /usr/share/nginx/html
 COPY ./database/install-schema.py /scripts
 COPY ./database/dno-schema.graphql /scripts
 
-# ENTRYPOINT ["tail"]
-# CMD ["-f","/dev/null"]
+ENTRYPOINT ["tail"]
+CMD ["-f","/dev/null"]
