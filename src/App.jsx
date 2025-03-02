@@ -12,12 +12,12 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route index element={<Home />} />
-      <Route path="m1" element={<M1Release />} />
-      <Route path="m2" element={<M2NodeOperators />} />
-      <Route path="m3" element={<M3Education />} />
-      <Route path="m4" element={<M4Mainenance />} />
-      <Route path="settings" element={<Settings />} />
-      <Route path="return-data" element={<Data />} />
+      <Route path="/m1" element={<M1Release />} />
+      <Route path="/m2" element={<M2NodeOperators />} />
+      <Route path="/m3" element={<M3Education />} />
+      <Route path="/m4" element={<M4Mainenance />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/return-data" element={<Data />} />
     </Route>
   )
 )

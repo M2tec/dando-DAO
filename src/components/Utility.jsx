@@ -1,6 +1,9 @@
 import { add, debounce } from 'lodash';
 import React from 'react';
 import { useRef, useEffect, useMemo } from 'react';
+
+let graphUrl = import.meta.env.VITE_GRAPH_URL
+
 export async function handleGC(gcscript) {
 
     console.log(JSON.stringify(gcscript))
@@ -17,22 +20,21 @@ export async function handleGC(gcscript) {
     window.open(url, '_blank', 'location=yes,height=700,width=520,scrollbars=yes,status=yes');
 }
 
-
 export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
-
-
-
 
 export async function handleQuery(gquery) {
 
     let gqlBody = JSON.stringify(gquery)
     // console.log(gqlBody)
+    console.log("API URL: ", graphUrl)
 
-    const url = "/api/graphql";
+    // graphUrl = "http://localhost:8080/graphql";
+        
+    // console.log("override", graphUrl)
     try {
-        const response = await fetch(url,
+        const response = await fetch(graphUrl,
             {
                 method: "POST",
                 headers: {
@@ -74,8 +76,6 @@ export function getObj(obj, path, delimiter = '.') {
     return cursor;
 }
 
-
-
 function myQuery(address, field, value){
     console.log(address)
     console.log(field)
@@ -112,7 +112,6 @@ function myQuery(address, field, value){
         .catch(console.error);
   }
 
-
 export class DelayedInput extends React.Component {
     constructor(props) {
         super(props)
@@ -143,7 +142,6 @@ export class DelayedInput extends React.Component {
         )
     }
 }
-
 
 export const useDebounce = (callback) => {
     const ref = useRef();

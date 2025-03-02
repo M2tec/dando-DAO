@@ -67,43 +67,43 @@ const NavBar = () => {
 
   }
 
-  function Connect(props) {
+  // function Connect(props) {
 
-    // console.log("Props", props)
-    let wa = props.walletAddress
+  //   // console.log("Props", props)
+  //   let wa = props.walletAddress
 
-    // console.log(wa)
-    if (wa == "") {
-      return (<></>)
-    }
+  //   // console.log(wa)
+  //   if (wa == "") {
+  //     return (<></>)
+  //   }
 
-    if (wa == "") {
+  //   if (wa == "") {
 
-      return (
-        <>
-          <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
-        </>
-      )
+  //     return (
+  //       <>
+  //         <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
+  //       </>
+  //     )
 
-    } else {
+  //   } else {
 
-      let firstWA = wa.slice(0,6)
-      let lastWA =  wa.slice(-6)
+  //     let firstWA = wa.slice(0,6)
+  //     let lastWA =  wa.slice(-6)
 
-      wa = firstWA + "..." + lastWA
+  //     wa = firstWA + "..." + lastWA
 
-      return (
-      <>
-      <div>
-        <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
-        <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
+  //     return (
+  //     <>
+  //     <div>
+  //       <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
+  //       <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
       
-      </div>
-      </>
-      )
-    }
+  //     </div>
+  //     </>
+  //     )
+  //   }
 
-  }
+  // }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -120,8 +120,13 @@ const NavBar = () => {
           </ul>
 
         </div>
-        <Connect
-          walletAddress={walletAddress} />
+      
+          {/*  <Connect walletAddress={walletAddress} */}
+                <div>
+        <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
+        <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button"></button>
+      
+      </div>
       </div>
     </nav>
   );
