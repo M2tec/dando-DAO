@@ -4,8 +4,8 @@ services:
     volumes:
       - ./data:/dgraph
     ports:
-      - 5080:5080
-      - 6080:6080
+      - 25080:5080
+      - 26080:6080
     restart: on-failure
     command: dgraph zero --my=zero:5080
     
@@ -14,21 +14,21 @@ services:
     volumes:
       - ./data:/dgraph
     ports:
-      - 8080:8080
-      - 9080:9080
+      - 28080:8080
+      - 29080:9080
     restart: on-failure
-    command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security whitelist=10.89.0.0/16
+    command: dgraph alpha --my=alpha:27080 --zero=zero:25080 --security whitelist=10.89.0.0/16
 
-  ratel:
-    image: dgraph/ratel:latest
-    ports:
-      - 8000:8000
+  # ratel:
+  #   image: dgraph/ratel:latest
+  #   ports:
+  #     - 8000:8000
 
   server:
     build:
       context: ./
     ports:
-      - "8180:80"
+      - "28888:80"
     volumes:
     - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro      
     restart: always

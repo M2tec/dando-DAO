@@ -82,8 +82,7 @@ const Settings = () => {
     `
 
     let gqlQuery = { query: gq.replace(/\n/g, ' ') };
-    // const gqlQuery = { query: "query { queryDno { firstName lastName address nodeUrl uptimes { uptimeData }}}"}
-
+    
     const fetchData = async () => {
 
         let gqlData = await handleQuery(gqlQuery)
