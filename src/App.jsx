@@ -13,7 +13,7 @@ import Errors from './pages/Errors';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" >
+    <Route path="/" element={<Header />}>
       <Route index element={<Home />} />
       <Route path="/m1" element={<M1Release />} />
       <Route path="/m2" element={<M2NodeOperators />} />

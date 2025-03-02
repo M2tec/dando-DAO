@@ -109,10 +109,6 @@ const Header = () => {
             <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m2">M2 Dandelion nodes</Link></li>
             <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m3">M3 Education</Link></li>
             <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m4">M4 Maintanance</Link></li>
-            {/* <li className="px-1 nav-item"><a className="nav-link text-white" href="/">Home</a></li>
-            <li className="px-1 nav-item"><a className="nav-link text-white" href="/m2">M2 Dandelion nodes</a></li>
-            <li className="px-1 nav-item"><a className="nav-link text-white" href="/m3">M3 Education</a></li>
-            <li className="px-1 nav-item"><a className="nav-link text-white" href="/m4">M4 Maintanance</a></li> */}
           </ul>
 
         </div>
@@ -120,7 +116,7 @@ const Header = () => {
           walletAddress={walletAddress} />
       </div>
     </nav>
-    {/* <Outlet /> */}
+    <Outlet />
     </>
   );
 };

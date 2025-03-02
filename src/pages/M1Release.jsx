@@ -8,7 +8,7 @@ const M1Release = () => {
 
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
       <div className="m-3">
       <h1 className="text-3xl font-bold mb-0"><b>Dandelion-lite Governance</b></h1>
         <p>Cardano decentralized server API's</p>

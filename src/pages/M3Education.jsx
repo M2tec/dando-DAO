@@ -8,7 +8,7 @@ const M3Education = () => {
 
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
       <div className="m-3">
       <h1 className="text-3xl font-bold mb-0"><b>Dandelion-lite Education</b></h1>
         <p>Building content add your proposals</p>

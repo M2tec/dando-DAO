@@ -9,7 +9,7 @@ const M2NodeOperators = () => {
 
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
       <div className="m-3">
       <h1 className="text-3xl font-bold mb-0"><b>Dandelion-lite Node Operator dashboard</b></h1>
         <p>Uptime display</p>
