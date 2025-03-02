@@ -146,7 +146,7 @@ const DNOUptimeDisplay = () => {
 
     return (
         <>
-            <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a>
+            {/* <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a> */}
 
             <div className='container-fluid p-0 m-0'>
                 {/* Heading */}
