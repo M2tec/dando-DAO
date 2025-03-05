@@ -34,5 +34,6 @@ COPY --from=vite-build /dando/dist /usr/share/nginx/html
 COPY ./database/install-schema.py /scripts
 COPY ./database/dno-schema.graphql /scripts
 
-ENTRYPOINT ["tail"]
-CMD ["-f","/dev/null"]
+### Debugging only
+# ENTRYPOINT ["tail"]
+# CMD ["-f","/dev/null"]

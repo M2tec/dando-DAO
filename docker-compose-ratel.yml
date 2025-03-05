@@ -1,0 +1,4 @@
+  ratel:
+    image: dgraph/ratel:latest
+    ports:
+      - 28000:8000

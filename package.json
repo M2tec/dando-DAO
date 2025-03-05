@@ -4,7 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "docker compose up -d && vite",
+    "down": "docker compose down",
+    "up": "docker compose up -d",
+    "schema": "cd database && ./install-schema.py http://localhost:28080/admin dno-schema.graphql && cd ..",
+    "deleteDb": "docker compose down && rm -rf data",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

@@ -1,14 +1,42 @@
 type Dno {
   id: ID!
   name: String @search
-  address: String! @id
-  nodeUrl: String
-  uptimes: Uptime
+  mainnetWallet: String! @id
+  testnetWallet: String
+  hardware: String!
+  networks: [Network]
 }
 
-type Uptime {
+enum Tag {
+  MIDNIGHT
+  GRAPHQL
+  KOIOS
+  OGMIOS
+  UNIMATRIX
+}
+
+enum Name {
+  CARDANO
+  MIDNIGHT
+}
+
+enum Subnet {
+  PREPROD
+  PREVIEW
+  MAINNET
+  SANCHONET
+}
+
+type Service {
   id: ID!
-  uptimeData: [String]
-  dnoId: Int
-  dno: Dno
+  tags: Tag
+  URL: String
+}
+
+type Network {
+  id: ID!
+  blockchain: Name
+  subnets: [Subnet]
+  services: [Service] 
+  dno: Dno!
 }

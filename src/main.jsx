@@ -4,6 +4,7 @@ import App from './App.jsx'
 import { loadModule } from './services/cardanoWasm';
 import './index.css'
 import "@fontsource/poppins/700.css";
+import "@fontsource/poppins/500.css";
 
 const AppLoader=()=>{
   const [cslReady,setCSLReady]=useState(null);
