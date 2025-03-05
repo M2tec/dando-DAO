@@ -1,9 +1,9 @@
 type Dno {
   id: ID!
   name: String @search
-  mainnetWallet: String! @id
-  testnetWallet: String
-  hardware: String!
+  mainnetWallet: String 
+  preprodWallet: String! @id
+  hardware: String
   networks: [Network]
 }
 
@@ -36,7 +36,7 @@ type Service {
 type Network {
   id: ID!
   blockchain: Name
-  subnets: [Subnet]
+  subnet: Subnet
   services: [Service] 
   dno: Dno!
 }

@@ -5,7 +5,6 @@ import { handleQuery, isEmpty, DelayedInput, useDebounce } from '../components/U
 
 const Settings = () => {
   const [walletAddress, setWalletAddress] = useState("")
-  const [userData, setUserData] = useState({})
   const [userDefaultData, setUserDefaultData] = useState({})
 
   useEffect(() => {
@@ -34,7 +33,9 @@ const Settings = () => {
     let gq = `query {
       getDno(address: "` + walletAddress + `") {
         name
-        nodeUrl
+        preprodWallet
+        mainnetWallet
+        hardware
       }
     }`
     let gqlQuery = { query: gq.replace(/\n/g, ' ') };
@@ -87,7 +88,7 @@ const Settings = () => {
 
         let gqlData = await handleQuery(gqlQuery)
 
-        // console.log(gqlData)
+        console.log(gqlData)
     }
 
     fetchData()
@@ -148,7 +149,7 @@ const Settings = () => {
 
               </div>
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">Node Url</label>
+                <label htmlFor="exampleFormControlInput1">mainnet wallet</label>
 
                 <Input 
                     type="text" 
@@ -157,10 +158,56 @@ const Settings = () => {
                     className="form-control" 
                     id="exampleFormControlInput1" 
                     placeholder="https://server1.dandelion.link" 
-                    defaultValue={userDefaultData.nodeUrl}
+                    defaultValue={userDefaultData.mainnetWallet}
                      />
 
               </div>
+
+              <div className="form-group mb-2">
+                <label htmlFor="exampleFormControlInput1">hardware</label>
+
+                <Input 
+                    type="text" 
+                    walletAddress={walletAddress} 
+                    field="nodeUrl"
+                    className="form-control" 
+                    id="exampleFormControlInput1" 
+                    placeholder="Atari" 
+                    defaultValue={userDefaultData.hardware}
+                     />
+
+              </div>
+
+              <div className="form-group mb-2">
+                <label htmlFor="exampleFormControlInput1">Node Url preprod</label>
+
+                <Input 
+                    type="text" 
+                    walletAddress={walletAddress} 
+                    field="nodeUrl"
+                    className="form-control" 
+                    id="exampleFormControlInput1" 
+                    placeholder="https://preprod.dandelion.link" 
+                    defaultValue={userDefaultData.preprodUrl}
+                     />
+
+              </div>              
+
+
+              <div className="form-group mb-2">
+                <label htmlFor="exampleFormControlInput1">Node Url mainnet</label>
+
+                <Input 
+                    type="text" 
+                    walletAddress={walletAddress} 
+                    field="nodeUrl"
+                    className="form-control" 
+                    id="exampleFormControlInput1" 
+                    placeholder="https://mainnet.dandelion.link" 
+                    defaultValue={userDefaultData.mainnetUrl}
+                     />
+
+              </div>              
 
             </form>
 

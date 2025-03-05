@@ -8,7 +8,7 @@ const DNOUptimeDisplay = () => {
 
         const fetchData = async () => {
 
-            let gqlQuery = { query: "query { queryDno { id name address nodeUrl uptimes { uptimeData }}}" }
+            let gqlQuery = { query: "query { queryDno { id name address }}" }
             let gqlData = await handleQuery(gqlQuery)
 
             // console.log(gqlData)
@@ -25,31 +25,23 @@ const DNOUptimeDisplay = () => {
         console.log("Update")
 
         let gq = `
-            mutation { addDno(input: [
+
+        mutation { addDno(input: [
             { 
                 name: "Adriano Fiorenza", 
-                address: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m"
-                nodeUrl: "sunflower.m2tec.nl"
-                uptimes: { uptimeData: ["001011001110010101", "000100111111111111", "00011111111111111"]}
+                mainnetWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
+                hardware: Intel286
             },
                 { 
                 name: "Roberto Moreno", 
-                address: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6"
-                nodeUrl: "og.dandelion.io"
-                uptimes: { uptimeData: ["00111111110010101", "00010011111111111", "00011111111111111"]}
+                mainnetWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6",
+                hardware: Atari
                 },
-                { 
-                name: "QUazar", 
-                address: "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"
-                nodeUrl: "dandelion.quazar.usa"
-                uptimes: { uptimeData: ["001011001111111111", "000100001111111111111", "0001000011111111111111"]}
-                }
             ], upsert: true )
             {
                 dno {
                     id
                     name
-                    uptimes { uptimeData}
                 }
             }
             }
@@ -146,7 +138,7 @@ const DNOUptimeDisplay = () => {
 
     return (
         <>
-            {/* <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a> */}
+            <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a>
 
             <div className='container-fluid p-0 m-0'>
                 {/* Heading */}

@@ -76,6 +76,7 @@ const Header = () => {
     if (walletAddress == "") {
       return (
         <>
+          <button className="btn btn-sm border text-white mx-2" type="button">Preprod</button>
           <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
         </>)
     } else {
@@ -87,6 +88,7 @@ const Header = () => {
       return (
 
         <div>
+          <button className="btn btn-sm border text-white mx-2" type="button">Preprod</button>
           <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
           <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
   

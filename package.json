@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "docker compose --profile dev up -d && vite",
     "down": "docker compose --profile dev down",
-    "up": "docker compose up -d",
+    "up": "docker compose --profile dev up -d",
     "schema": "cd database && ./install-schema.py http://localhost:28080/admin dno-schema.graphql && cd ..",
-    "deleteDb": "docker compose down && rm -rf data",
+    "deleteDb": "docker compose --profile dev down && rm -rf data",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

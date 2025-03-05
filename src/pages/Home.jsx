@@ -2,12 +2,9 @@ import { useEffect, useState } from 'react'
 import UnimatrixListener from '../services/UnimatrixListener';
 import Gun from 'gun';
 import Signers from './Signers';
-import holdingHandsImage from '../assets/holding_hands.png'
-import proposalsImage from '../assets/proposals.jpg'
 import Footer from '../components/Footer';
 import MilestoneCard from "../components/MilestoneCard";
-import NavBar from '../components/Header';
-import { handleGC } from '../components/Utility';
+
 
 const milestones = [
   {
