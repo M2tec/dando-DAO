@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "docker compose up -d && vite",
-    "down": "docker compose down",
+    "dev": "docker compose --profile dev up -d && vite",
+    "down": "docker compose --profile dev down",
     "up": "docker compose up -d",
     "schema": "cd database && ./install-schema.py http://localhost:28080/admin dno-schema.graphql && cd ..",
     "deleteDb": "docker compose down && rm -rf data",
