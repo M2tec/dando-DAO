@@ -5,11 +5,9 @@ import requests
 import time
 import json
 
-
 def remove_newlines(text):
     text = text.replace('', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
     return text
-
 
 def get_data(database_url, query):
     # Query Dando gov
@@ -25,7 +23,6 @@ def get_data(database_url, query):
         print(e)
     
     return r.json()
-
 
 def main():
     parser = argparse.ArgumentParser(description="Update GraphQL schema on a Dgraph server.")
@@ -62,7 +59,6 @@ def main():
     r = get_data(args.db_url, query)
 
     print(json.dumps(r.json(), indent=2))
-
 
 if __name__ == "__main__":
     main()

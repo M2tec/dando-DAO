@@ -40,16 +40,18 @@ def main():
     for i in range(0, 15):
         try:
             r = requests.post(args.db_url, json={"query": mutation})
-            
+            print("\nConnecting to: " + args.db_url + "\tstatus: [" + str(r.status_code) +"]\n")
+            break
         except requests.exceptions.ConnectionError:
             time.sleep(3)
-            print(json.dumps(r.json(), indent=2))
+            # print(json.dumps(r.json(), indent=2))
             print("Waiting for connection")
 
     message = r.json()
     
     for i in range(0, 15):
         if "errors" in message:
+            print(message['errors'][0]['message'])
             r = requests.post(args.db_url, json={"query": mutation})
             message = r.json()  
             print("Waiting for db to be ready ... " + str(i))# , end="  ")

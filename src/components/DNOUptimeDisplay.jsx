@@ -6,10 +6,22 @@ const DNOUptimeDisplay = () => {
 
     useEffect(() => {
 
+
+
+        
         const fetchData = async () => {
 
-            let gqlQuery = { query: "query { queryDno { id name preprodWallet }}" }
-            let gqlData = await handleQuery(gqlQuery)
+
+            let gq = `
+query { 
+    queryDno { 
+        id 
+        name 
+        preprodWallet
+    }
+}          
+            `
+            let gqlData = await handleQuery(gq)
 
             // console.log(gqlData)
             let dData = gqlData.data.queryDno;
@@ -48,12 +60,12 @@ mutation { addDno(input: [
 
 `
 
-        let gqlQuery = { query: gq.replace(/\n/g, ' ') };
+        // let gqlQuery = { query: gq.replace(/\n/g, ' ') };
         // const gqlQuery = { query: "query { queryDno { firstName lastName address nodeUrl uptimes { uptimeData }}}"}
 
         const fetchData = async () => {
 
-            let gqlData = await handleQuery(gqlQuery)
+            let gqlData = await handleQuery(gq)
             console.log(gqlData)
 
         }

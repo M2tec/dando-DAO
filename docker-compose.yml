@@ -21,7 +21,7 @@ services:
       - 28080:8080
       - 29080:9080
     restart: on-failure
-    command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security whitelist=10.89.0.0/16
+    command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security whitelist=0.0.0.0/0
     profiles:
     - production
     - dev

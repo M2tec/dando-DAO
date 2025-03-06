@@ -24,11 +24,14 @@ export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-export async function handleQuery(gquery) {
+export async function handleQuery(gq) {
+    console.log("API URL: ", graphUrl) 
+    console.log(gq)
 
+    let gquery = { query: gq.replace(/\n/g, ' ') };
+    
     let gqlBody = JSON.stringify(gquery)
 
-    console.log("API URL: ", graphUrl)
     try {
         const response = await fetch(graphUrl,
             {
@@ -94,12 +97,12 @@ function myQuery(address, field, value){
         }
     `
 
-    let gqlQuery = { query: gq.replace(/\n/g, ' ') };
+    
     // const gqlQuery = { query: "query { queryDno { firstName lastName address nodeUrl uptimes { uptimeData }}}"}
 
     const fetchData = async () => {
 
-        let gqlData = await handleQuery(gqlQuery)
+        let gqlData = await handleQuery(gq)
 
         console.log(gqlData)
     }

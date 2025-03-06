@@ -32,7 +32,14 @@ If running for the first time install the database schema
 ```bash
 npm run schema
 ```
+## Dgraph security
+
+Set the whitelist in production to the ip adress that is being used. Now it is wide open
+```bash
+command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security whitelist=0.0.0.0/0
+```
 
 ## Setting CORS serverside 
 
 ngrok http --host-header=rewrite 8080 --response-header-add "Access-Control-Allow-Headers: Content-Type"  
+
