@@ -31,7 +31,7 @@ const Settings = () => {
   const fetchData = async () => {
 
     let gq = `query {
-      getDno(address: "` + walletAddress + `") {
+      getDno(preprodWallet: "` + walletAddress + `") {
         name
         preprodWallet
         mainnetWallet
@@ -39,7 +39,7 @@ const Settings = () => {
       }
     }`
     let gqlQuery = { query: gq.replace(/\n/g, ' ') };
-    // console.log(gqlQuery)
+    console.log(gqlQuery)
     
       // let gqlQuery = { query: "query { queryDno { id name address nodeUrl uptimes { uptimeData }}}" }
       let gqlData = await handleQuery(gqlQuery)
@@ -65,22 +65,47 @@ const Settings = () => {
     console.log(field)
     console.log(value)
 
+    if (field == "preprodUrl" || "mainnetUrl") {
+      let gq = `
+      mutation { addDno(input: [
+      {    
+      preprodWallet: "` + address + `",
+              "Dno.networks": [
+          {
+         
+            "blockchain": "CARDANO",
+            "subnet": "PREPROD",
+            "
+          }
+        ]
+      ` + field + `: "` + value + `"
+      }], upsert: true)
+      {
+          dno {
+          id
+          name
+          preprodWallet            
+          }
+      }
+      }
+    `
+    } else {
     let gq = `
         mutation { addDno(input: [
         {    
-        address: "` + address + `",
+        preprodWallet: "` + address + `",
         ` + field + `: "` + value + `"
         }], upsert: true)
         {
             dno {
             id
             name
-            address
-            nodeUrl
+            preprodWallet            
             }
         }
         }
     `
+    }
 
     let gqlQuery = { query: gq.replace(/\n/g, ' ') };
     
@@ -149,12 +174,12 @@ const Settings = () => {
 
               </div>
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">mainnet wallet</label>
+                <label htmlFor="exampleFormControlInput1">Mainnet wallet</label>
 
                 <Input 
                     type="text" 
                     walletAddress={walletAddress} 
-                    field="nodeUrl"
+                    field="mainnetWallet"
                     className="form-control" 
                     id="exampleFormControlInput1" 
                     placeholder="https://server1.dandelion.link" 
@@ -164,12 +189,12 @@ const Settings = () => {
               </div>
 
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">hardware</label>
+                <label htmlFor="exampleFormControlInput1">Hardware</label>
 
                 <Input 
                     type="text" 
                     walletAddress={walletAddress} 
-                    field="nodeUrl"
+                    field="hardware"
                     className="form-control" 
                     id="exampleFormControlInput1" 
                     placeholder="Atari" 

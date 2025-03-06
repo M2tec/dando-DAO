@@ -8,7 +8,7 @@ const DNOUptimeDisplay = () => {
 
         const fetchData = async () => {
 
-            let gqlQuery = { query: "query { queryDno { id name address }}" }
+            let gqlQuery = { query: "query { queryDno { id name preprodWallet }}" }
             let gqlData = await handleQuery(gqlQuery)
 
             // console.log(gqlData)
@@ -26,25 +26,26 @@ const DNOUptimeDisplay = () => {
 
         let gq = `
 
-        mutation { addDno(input: [
-            { 
-                name: "Adriano Fiorenza", 
-                mainnetWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
-                hardware: Intel286
-            },
-                { 
-                name: "Roberto Moreno", 
-                mainnetWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6",
-                hardware: Atari
-                },
-            ], upsert: true )
-            {
-                dno {
-                    id
-                    name
-                }
-            }
-            }
+mutation { addDno(input: [
+    { 
+        name: "Adriano Fiorenza", 
+        mainnetWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
+        preprodWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
+    },
+    { 
+        name: "Roberto Moreno", 
+        mainnetWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6",
+        preprodWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6"
+    }
+    ], upsert: true )
+    {
+        dno {
+            id
+            name
+        }
+    }
+}
+
 `
 
         let gqlQuery = { query: gq.replace(/\n/g, ' ') };
