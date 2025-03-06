@@ -79,7 +79,8 @@ const Data = () => {
     }
   }, [resultObj])
 
-  window.close()
+  // Comment out the window close for debugging the return value
+  // window.close()
   return (<h1>Results</h1>)
 };
 

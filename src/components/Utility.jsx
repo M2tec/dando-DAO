@@ -25,11 +25,11 @@ export function isEmpty(obj) {
 }
 
 export async function handleQuery(gq) {
-    console.log("API URL: ", graphUrl) 
+    console.log("API URL: ", graphUrl)
     console.log(gq)
 
     let gquery = { query: gq.replace(/\n/g, ' ') };
-    
+
     let gqlBody = JSON.stringify(gquery)
 
     try {
@@ -46,9 +46,18 @@ export async function handleQuery(gq) {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        const json = await response.json();
+        const gqlData = await response.json();
+        // console.log(gqlData)
+        if (typeof gqlData["errors"] !== 'undefined' || gqlData["errors"] === null) {
+            console.log("GQL query error: \n" + gqlData["errors"][0]['message'])
+
+        } else {
+            console.log(gqlData)
+        }
+
+
         // console.log(json);
-        return json
+        return gqlData
 
     } catch (error) {
         console.error(error.message);
@@ -75,7 +84,7 @@ export function getObj(obj, path, delimiter = '.') {
     return cursor;
 }
 
-function myQuery(address, field, value){
+function myQuery(address, field, value) {
     console.log(address)
     console.log(field)
     console.log(value)
@@ -97,7 +106,7 @@ function myQuery(address, field, value){
         }
     `
 
-    
+
     // const gqlQuery = { query: "query { queryDno { firstName lastName address nodeUrl uptimes { uptimeData }}}"}
 
     const fetchData = async () => {
@@ -109,31 +118,31 @@ function myQuery(address, field, value){
 
     fetchData()
         .catch(console.error);
-  }
+}
 
 export class DelayedInput extends React.Component {
     constructor(props) {
         super(props)
 
-        
+
         this.state = { value: "test" }
         console.log("constructor", props)
 
         // Delay action in miliseconds 
         this.onChangeDebounced = debounce(this.onChangeDebounced, 1000)
-    } 
-    
+    }
+
     handleInputChange = (e) => {
         this.setState({ value: e.target.value })
         // Execute the debounced onChange method 
-    
+
         console.log("s", this.props)
         this.onChangeDebounced(e)
     }
-    
+
     onChangeDebounced = (e) => {
         myQuery(this.props.walletAddress, this.props.field, e.target.value)
-        console.log(e.target.value) 
+        console.log(e.target.value)
     }
     render() {
         return (
@@ -144,18 +153,18 @@ export class DelayedInput extends React.Component {
 
 export const useDebounce = (callback) => {
     const ref = useRef();
-  
+
     useEffect(() => {
-      ref.current = callback;
+        ref.current = callback;
     }, [callback]);
-  
+
     const debouncedCallback = useMemo(() => {
-      const func = () => {
-        ref.current?.();
-      };
-  
-      return debounce(func, 1000);
+        const func = () => {
+            ref.current?.();
+        };
+
+        return debounce(func, 1000);
     }, []);
-  
+
     return debouncedCallback;
-  };
+};

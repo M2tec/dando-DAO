@@ -50,8 +50,12 @@ def main():
     message = r.json()
     
     for i in range(0, 15):
+        
         if "errors" in message:
-            print(message['errors'][0]['message'])
+            
+            for messages in message['errors']:
+              print(messages['message'])
+
             r = requests.post(args.db_url, json={"query": mutation})
             message = r.json()  
             print("Waiting for db to be ready ... " + str(i))# , end="  ")
