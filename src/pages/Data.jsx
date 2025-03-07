@@ -80,7 +80,19 @@ const Data = () => {
   }, [resultObj])
 
   // Comment out the window close for debugging the return value
-  // window.close()
+  
+  let projectState = import.meta.env
+  console.log(projectState)
+
+  console.log(projectState.DEV)
+
+  if (projectState.DEV) {
+    console.log("dev mode")
+  } else {
+    console.log("production mode")
+    window.close
+  }
+
   return (<h1>Results</h1>)
 };
 

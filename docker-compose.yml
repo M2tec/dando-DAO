@@ -31,7 +31,6 @@ services:
     ports:
       - 28000:8000
     profiles:
-    - production
     - dev
     
   server:
