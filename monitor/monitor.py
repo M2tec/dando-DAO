@@ -15,10 +15,11 @@ def graphql_query(database_url, query, variables=""):
     #print("Variables :\n\n" + variables + "\n===================\n")
 
     query = remove_newlines(query)
-    #variables = remove_newlines(variables)
+    variables = remove_newlines(variables)
+    variables = json.loads(variables)
     #print("v", variables)
     #myjson={"query": query, "variables": variables}
-    myjson={"query": query}
+    myjson={"query": query, "variables": variables}
     
     print(myjson)
     try:
@@ -144,13 +145,13 @@ def main():
     # parser.add_argument("gov_url", help="Dando governance database URL (e.g., http://alpha:8080/graphql)")
 
     # args = parser.parse_args()
-    governance_url = "http://dgraph.m2tec.nl/graphql"
-    # governance_url = "http://localhost:28080/graphql"
+    #governance_url = "http://dgraph.m2tec.nl/graphql"
+    governance_url = "http://localhost:28080/graphql"
     # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
 
     preprodWallet = "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"
-    # update_uptime(governance_url, preprodWallet)
-    dno_urls = query_governance(governance_url)
+    update_uptime(governance_url, preprodWallet)
+    #dno_urls = query_governance(governance_url)
     # print(dno_urls)
 
     # for dno_url in dno_urls:
