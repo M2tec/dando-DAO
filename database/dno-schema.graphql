@@ -4,7 +4,33 @@ type Dno {
   mainnetWallet: String @id
   preprodWallet: String! @id
   hardware: String
+  preprodUrl: String
+  preprodUptime: [Uptime]
+  pUptime: [String]
+  mainnetUrl: String
+  mainnetUptime: [Uptime]
   networks: [Network]
+}
+
+enum Month {
+  JANUARI
+  FEBRUARI
+  MARCH
+  APRIL
+  MAY
+  JUNE
+  JULY
+  AUGUST
+  SEPTEMBER
+  OKTOBER 
+  NOVEMBER
+  DECEMBER
+}
+
+type Uptime {
+  month: Month!
+  year: String!
+  days: String!
 }
 
 enum Tag {

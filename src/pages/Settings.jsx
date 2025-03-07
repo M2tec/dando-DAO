@@ -5,7 +5,7 @@ import { handleQuery, isEmpty, DelayedInput, useDebounce } from '../components/U
 
 const Settings = () => {
   const [walletAddress, setWalletAddress] = useState("")
-  const [userDefaultData, setUserDefaultData] = useState({"name": "test"})
+  const [userDefaultData, setUserDefaultData] = useState({"name": ""})
 
   useEffect(() => {
     console.log("Userdata", userDefaultData.name)
@@ -36,6 +36,8 @@ const Settings = () => {
         preprodWallet
         mainnetWallet
         hardware
+        preprodUrl
+        mainnetUrl
       }
     }`
       // let gqlQuery = { query: gq.replace(/\n/g, ' ') };
@@ -124,13 +126,12 @@ const Settings = () => {
       debouncedRequest();
     };
 
-    return <input type="text" className="form-control" onChange={onChange} value={value} defaultValue={props.defaultValue} />;
+    return <input type="text" className="form-control" onChange={onChange} defaultValue={props.defaultValue} />;
   }
 
 
   return (
     <>
-      {/* <NavBar /> */}
       <div className="m-3">
         <h1 className="text-3xl font-bold mb-0"><b>Settings</b></h1>
         <p>Add you DNO info for rewards</p>
@@ -197,7 +198,7 @@ const Settings = () => {
                 <Input
                   type="text"
                   walletAddress={walletAddress}
-                  field="nodeUrl"
+                  field="preprodUrl"
                   className="form-control"
                   id="exampleFormControlInput1"
                   placeholder="https://preprod.dandelion.link"
@@ -213,7 +214,7 @@ const Settings = () => {
                 <Input
                   type="text"
                   walletAddress={walletAddress}
-                  field="nodeUrl"
+                  field="mainnetUrl"
                   className="form-control"
                   id="exampleFormControlInput1"
                   placeholder="https://mainnet.dandelion.link"

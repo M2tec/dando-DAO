@@ -37,3 +37,75 @@ mutation { addDno(input: [
     }
   }
 }
+
+mutation { addDno(input: [
+    { 
+        name: "Adriano Fiorenza", 
+        mainnetWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
+        preprodWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
+    },
+    { 
+        name: "Roberto Moreno", 
+        mainnetWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6",
+        preprodWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6"
+    }
+    ], upsert: true )
+    {
+        dno {
+            id
+            name
+        }
+    }
+}
+
+    if (field == "preprodUrl" || "mainnetUrl") {
+      gq = `
+      mutation { addDno(input: [
+      {    
+      preprodWallet: "` + address + `",
+      ` + field + `: "` + value + `"
+      }], upsert: true)
+      {
+          dno {
+          id
+          name
+          preprodWallet            
+          }
+      }
+      }
+
+
+mutation { addDno(input: [
+      {    
+      preprodWallet: "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg",
+      preprodUptime: "'011111110000010011000010011012'"
+      }], upsert: true)
+      {
+          dno {
+          id
+          name
+          preprodWallet
+          preprodUptime         
+          }
+      }
+      }
+
+
+mutation updateDno( $patch:  UpdateDnoInput!) {
+  	updateDno(input: $patch) {
+    dno {
+      preprodWallet
+      pUptime
+    }
+  }
+}
+
+{
+  "patch": {
+    "filter": {
+      "preprodWallet": {"eq": "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"}},
+    "remove": {
+      "pUptime": ["updated text"]
+    }
+  }
+}

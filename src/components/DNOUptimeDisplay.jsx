@@ -160,13 +160,13 @@ mutation { addDno(input: [
                         <b>DNO</b>
                     </div>
                     <div className='col-3 m-0 px-1'>
+                    <b>Januari</b>
+                    </div>
+                    <div className='col-3 m-0 px-1'>
+                    <b>Februari</b>
+                    </div>
+                    <div className='col-3 m-0 px-1'>
                     <b>March</b>
-                    </div>
-                    <div className='col-3 m-0 px-1'>
-                    <b> April</b>
-                    </div>
-                    <div className='col-3 m-0 px-1'>
-                    <b> May</b>
                     </div>
                 </div>
 
