@@ -90,7 +90,7 @@ const Data = () => {
     console.log("dev mode")
   } else {
     console.log("production mode")
-    window.close
+    window.close();
   }
 
   return (<h1>Results</h1>)
