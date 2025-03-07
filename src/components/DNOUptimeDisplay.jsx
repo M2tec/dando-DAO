@@ -114,9 +114,6 @@ mutation { addDno(input: [
                 item["pUptime"] = up
                 console.log(item)
                 }
-            
-
-
                     
          return (
          <div key={index} className='row m-0 mb-2'>

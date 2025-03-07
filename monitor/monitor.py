@@ -7,18 +7,24 @@ import json
 import random
 
 def remove_newlines(text):
-    text = text.replace('', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
+    text = text.replace('\n', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
     return text
 
-def graphql_query(database_url, query, variables):
-    print(query)
+def graphql_query(database_url, query, variables=""):
+    print("\nQuery :\n\n" + query + "\n===================\n")
+    #print("Variables :\n\n" + variables + "\n===================\n")
+
     query = remove_newlines(query)
-    variables = remove_newlines(variables)
-    myjson={"query": query, "variables": variables}
+    #variables = remove_newlines(variables)
+    #print("v", variables)
+    #myjson={"query": query, "variables": variables}
+    myjson={"query": query}
+    
     print(myjson)
     try:
-        r = requests.post(database_url, json={"query": query, "variables": variables})
+        r = requests.post(database_url, json=myjson)
         print(r)
+        print(r.headers)
         print(json.dumps(r.json(), indent=2))
     except requests.exceptions.ConnectionError as e:
         print(e)
@@ -30,11 +36,14 @@ def graphql_query(database_url, query, variables):
 
 def query_dno(dno_url):
 
+    
+    
+
+    # GraphQL
     dno_url = dno_url.removesuffix('/') + "/cardano-graphql" 
     print("\nQuery dno at: " + dno_url)
     print("\nQuery tip:")
     
-    # Query Dando node 
     query = """query { cardano
     { tip 
         { number slotNo epoch
@@ -44,9 +53,10 @@ def query_dno(dno_url):
 }
     """
 
-
     r = graphql_query(dno_url, query)
     print(r)
+
+    # koios 
 
     return True
 
@@ -58,6 +68,7 @@ def query_governance(dno_url):
     queryDno { 
         name
         preprodWallet
+        mainnetWallet
         preprodUrl
         preprodUptime
       	mainnetUrl
@@ -67,6 +78,8 @@ def query_governance(dno_url):
     """
 
     r = graphql_query(dno_url, query)
+
+    print(r)
 
     dno_datas = r["data"]["queryDno"]
 
@@ -100,22 +113,6 @@ def update_uptime(governance_url, preprodWallet):
 
     print(uptimes)
 
-    # query = """mutation {{ addDno(input: [
-    #   {{    
-    #   preprodWallet: "{preprodWallet}",
-    #   preprodUptime: "{uptimes}"
-    #   }}], upsert: false)
-    #   {{
-    #       dno {{
-    #       id
-    #       name
-    #       preprodWallet
-    #       preprodUptime         
-    #       }}
-    #   }}
-    #   }}
-    # """.format(preprodWallet=preprodWallet, uptimes=uptimes)
-
     query = """mutation updateDno( $patch:  UpdateDnoInput!) {
   	updateDno(input: $patch) {
     dno {
@@ -125,6 +122,8 @@ def update_uptime(governance_url, preprodWallet):
     }
     }"""
     
+    uptimes = str(uptimes).replace("\'", "\"") 
+
     variables = """
 {{
   "patch": {{
@@ -138,8 +137,6 @@ def update_uptime(governance_url, preprodWallet):
 
 
 
-    print(query)
-
     r = graphql_query(governance_url, query, variables)
 
 def main():
@@ -147,12 +144,13 @@ def main():
     # parser.add_argument("gov_url", help="Dando governance database URL (e.g., http://alpha:8080/graphql)")
 
     # args = parser.parse_args()
-    governance_url = "http://localhost:28080/graphql"
+    governance_url = "http://dgraph.m2tec.nl/graphql"
+    # governance_url = "http://localhost:28080/graphql"
     # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
 
     preprodWallet = "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"
-    update_uptime(governance_url, preprodWallet)
-    # dno_urls = query_governance(governance_url)
+    # update_uptime(governance_url, preprodWallet)
+    dno_urls = query_governance(governance_url)
     # print(dno_urls)
 
     # for dno_url in dno_urls:
