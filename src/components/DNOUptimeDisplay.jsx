@@ -18,6 +18,7 @@ query {
         id 
         name 
         preprodWallet
+        pUptime
     }
 }          
             `
@@ -94,7 +95,8 @@ mutation { addDno(input: [
 
     function DnoListData(props) {
 
-        // console.log("Props", props)
+        
+        console.log("Props", props)
         let dnoList = props.dnoData
 
         if (isEmpty(dnoList)) {
@@ -104,11 +106,11 @@ mutation { addDno(input: [
         console.log("dnoList", dnoList)
         const DnoItems = dnoList.map((item, index) => // { console.log("item", item.uptimes.uptimeData[0])}
         {
-            // console.log(item.uptimes.uptimeData[0])
+            console.log(item.pUptimes)
 
-        if (item.uptimes == null) {
+        if (item.pUptime == null) {
             let up = {uptimeData : ["111","000","000"]}
-            item["uptimes"] = up
+            item["pUptimes"] = up
                 }
          return (
          <div key={index} className='row m-0 mb-2'>
@@ -120,19 +122,19 @@ mutation { addDno(input: [
                 <div className='col-3 px-1'>
                     <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
-                            uptimeData={item.uptimes.uptimeData[0]} />
+                            uptimeData={item.pUptime[0]} />
                     </div>
                 </div>
                 <div className='col-3 px-1'>
                     <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
-                            uptimeData={item.uptimes.uptimeData[1]} />
+                            uptimeData={item.pUptime[1]} />
                     </div>
                 </div>
                 <div className='col-3 px-1'>
                     <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
-                            uptimeData={item.uptimes.uptimeData[2]} />
+                            uptimeData={item.pUptime[2]} />
                     </div>
                 </div>
             </div>
@@ -151,7 +153,7 @@ mutation { addDno(input: [
 
     return (
         <>
-            <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a>
+            {/* <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a> */}
 
             <div className='container-fluid p-0 m-0'>
                 {/* Heading */}

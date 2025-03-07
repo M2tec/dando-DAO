@@ -94,7 +94,7 @@ def update_uptime(governance_url, preprodWallet):
     print("update uptime")
     
     uptimes = []
-    for i in range(0, 2):
+    for i in range(0, 3):
         uptime = uptimes_month()
         uptimes.append(uptime)
 
