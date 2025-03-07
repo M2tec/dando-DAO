@@ -1,2 +1,4 @@
 #!/bin/bash
-docker compose --profile production up --build
+set -x
+docker compose --profile production up --build -d
+

@@ -106,12 +106,18 @@ mutation { addDno(input: [
         console.log("dnoList", dnoList)
         const DnoItems = dnoList.map((item, index) => // { console.log("item", item.uptimes.uptimeData[0])}
         {
-            console.log(item.pUptimes)
-
-        if (item.pUptime == null) {
-            let up = {uptimeData : ["111","000","000"]}
-            item["pUptimes"] = up
+ 
+            if (item.pUptime === undefined || item.pUptime.length == 0) {
+                console.log("undefined")
+    
+                let up = ["111","000","000"]
+                item["pUptime"] = up
+                console.log(item)
                 }
+            
+
+
+                    
          return (
          <div key={index} className='row m-0 mb-2'>
                 <div className='col-3 px-0'>
@@ -153,8 +159,6 @@ mutation { addDno(input: [
 
     return (
         <>
-            {/* <a className="btn btn-primary" onClick={handleUpdateData}>Update data</a> */}
-
             <div className='container-fluid p-0 m-0'>
                 {/* Heading */}
                 <div className='row m-0'>
