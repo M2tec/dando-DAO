@@ -1,9 +1,11 @@
 import { useSearchParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { useCookies } from "react-cookie";
 
 const Data = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [resultObj, setResultObj] = useState({});
+  const [cookies, setCookie, removeCookie] = useCookies(['preprodWallet'])
 
 
   async function decodeActionUrl(returnData) {
@@ -71,7 +73,7 @@ const Data = () => {
         console.log(address)
 
         localStorage.setItem("login_0", JSON.stringify(address))
-
+        setCookie('preprodWallet', address);
       }  else {
         console.log(resultObj.exports)
       }

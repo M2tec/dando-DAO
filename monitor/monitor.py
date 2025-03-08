@@ -151,6 +151,9 @@ def main():
 
     preprodWallet = "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"
     update_uptime(governance_url, preprodWallet)
+
+    
+
     #dno_urls = query_governance(governance_url)
     # print(dno_urls)
 

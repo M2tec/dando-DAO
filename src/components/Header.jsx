@@ -2,25 +2,38 @@ import { isEmpty, handleGC } from "./Utility";
 import { Outlet, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Gear } from "react-bootstrap-icons";
+import { useCookies } from "react-cookie";
 
 const Header = () => {
   const [walletAddress, setWalletAddress] = useState("")
+  const [cookies, setCookie, removeCookie] = useCookies(['preprodWallet'])
 
   useEffect(() => {
+    console.log("cookies", cookies['preprodWallet'])
 
+    //let walletAddress = JSON.parse(localStorage.getItem("login_0"));
+    let walletAddress = cookies['preprodWallet'];
 
-    let walletAddress = JSON.parse(localStorage.getItem("login_0"));
-
-    if (walletAddress === null) {
+    if (walletAddress === null || walletAddress === undefined) {
       walletAddress = ""
     }
 
     setWalletAddress(walletAddress)
 
-    window.addEventListener('storage', () => {
-      console.log("StorageEvent")
-      setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
-    });
+    if ('cookieStore' in window) {
+      cookieStore.addEventListener('change', (event) => {
+        event.changed.forEach(change => {
+          console.log(`Cookie '${change.name}' was ${change.removed ? 'removed' : 'changed to: ' + change.value}`);
+          setWalletAddress(change.value)
+        });
+      });
+    }
+
+
+    // window.addEventListener('storage', () => {
+    //   console.log("StorageEvent")
+    //   setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
+    // });
 
 
   }, []);
@@ -80,8 +93,8 @@ const Header = () => {
           <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">Connect wallet</button>
         </>)
     } else {
-      let firstWA = walletAddress.slice(0,6)
-      let lastWA =  walletAddress.slice(-6)
+      let firstWA = walletAddress.slice(0, 6)
+      let lastWA = walletAddress.slice(-6)
 
       let wa = firstWA + "..." + lastWA
 
@@ -91,34 +104,34 @@ const Header = () => {
           <button className="btn btn-sm border text-white mx-2" type="button">Preprod</button>
           <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
           <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
-  
+
         </div>
-        )
+      )
     }
 
   }
 
   return (
     <>
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div className="container-fluid">
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ml-auto">
-            <li className="px-1 nav-item"><Link className="nav-link text-white" to="/">Home</Link></li>
-            <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m2">M2 Dandelion nodes</Link></li>
-            <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m3">M3 Education</Link></li>
-            <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m4">M4 Maintanance</Link></li>
-          </ul>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div className="container-fluid">
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav ml-auto">
+              <li className="px-1 nav-item"><Link className="nav-link text-white" to="/">Home</Link></li>
+              <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m2">M2 Dandelion nodes</Link></li>
+              <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m3">M3 Education</Link></li>
+              <li className="px-1 nav-item"><Link className="nav-link text-white" to="/m4">M4 Maintanance</Link></li>
+            </ul>
 
+          </div>
+          <Connect
+            walletAddress={walletAddress} />
         </div>
-        <Connect
-          walletAddress={walletAddress} />
-      </div>
-    </nav>
-    <Outlet />
+      </nav>
+      <Outlet />
     </>
   );
 };

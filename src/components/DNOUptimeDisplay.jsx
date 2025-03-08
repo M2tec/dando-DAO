@@ -83,19 +83,28 @@ mutation { addDno(input: [
                 </div>
             )
 
-        } else {
+        } else if (item == 0)  {
             return (
                 <div key={index} className="col m-0 p-0">
                     <div className='bg-secondary m-0 p-0'><br /></div>
                 </div>
             )
+        } else {
+            return (
+                <div key={index} className="col m-0 p-0">
+                    <div className='bg-white m-0 p-0'><br /></div>
+                </div>
+            )            
         }
     }
     );
 
+    function daysInMonth (month, year) {
+        return new Date(year, month, 0).getDate();
+    }
+
     function DnoListData(props) {
 
-        
         console.log("Props", props)
         let dnoList = props.dnoData
 
@@ -103,6 +112,22 @@ mutation { addDno(input: [
             return (<></>)
         }
 
+        let months = []
+        for (var i = -2; i <= 0; i += 1) {
+            let current = new Date();
+            current.setMonth(current.getMonth() + i);
+            let monthNumber = current.toLocaleString('default', { month: 'numeric' });
+            let monthName = current.toLocaleString('default', { month: 'long' });
+            let numberOfDays = daysInMonth(monthNumber,2025)
+            let monthObj = { monthNumber: monthNumber, monthName: monthName, numberOfDays: numberOfDays}
+            
+            months.push(monthObj)
+        }
+
+        console.log(months); // "September"
+
+        
+ 
         console.log("dnoList", dnoList)
         const DnoItems = dnoList.map((item, index) => // { console.log("item", item.uptimes.uptimeData[0])}
         {
@@ -125,19 +150,22 @@ mutation { addDno(input: [
                 <div className='col-3 px-1'>
                     <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
-                            uptimeData={item.pUptime[0]} />
+                            uptimeData={item.pUptime[0]} 
+                            monthLength={months[0].numberOfDays}/>
                     </div>
                 </div>
                 <div className='col-3 px-1'>
                     <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
-                            uptimeData={item.pUptime[1]} />
+                            uptimeData={item.pUptime[1]}
+                            monthLength={months[1].numberOfDays} />
                     </div>
                 </div>
                 <div className='col-3 px-1'>
                     <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                         <ProcessMonth
-                            uptimeData={item.pUptime[2]} />
+                            uptimeData={item.pUptime[2]}
+                            monthLength={months[2].numberOfDays} />
                     </div>
                 </div>
             </div>
