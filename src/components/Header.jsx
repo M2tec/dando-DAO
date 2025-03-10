@@ -11,7 +11,6 @@ const Header = () => {
   useEffect(() => {
     console.log("cookies", cookies['preprodWallet'])
 
-    //let walletAddress = JSON.parse(localStorage.getItem("login_0"));
     let walletAddress = cookies['preprodWallet'];
 
     if (walletAddress === null || walletAddress === undefined) {
@@ -28,13 +27,6 @@ const Header = () => {
         });
       });
     }
-
-
-    // window.addEventListener('storage', () => {
-    //   console.log("StorageEvent")
-    //   setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
-    // });
-
 
   }, []);
 
