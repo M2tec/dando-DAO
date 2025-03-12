@@ -21,3 +21,126 @@ query {
     datePublished
   }
 }
+
+
+
+
+
+      mutation { addDno(input: [
+      {    
+      preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+      name: "Maarten Menheere"
+      }], upsert: true)
+      {
+          dno {
+          id
+          name
+          preprodWallet            
+          }
+      }
+      }
+
+
+
+
+
+
+      mutation updateDno($patch: UpdateDnoInput!) {
+  updateDno(input: $patch) {
+    dno {
+      preprodWallet
+      preprodUptime {
+        month
+        days
+      }
+    }
+  }
+}
+
+{
+  "patch": {
+    "filter": {
+      "preprodWallet": {
+        "eq": "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+      }
+    },
+    "set": {
+      "preprodUptime": {
+        "month": 3,
+        "days": "011111011010010111100101100101"
+      }
+    }
+  }
+}
+
+
+      mutation { addDno(input: [
+      {    
+      preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+      name: "Maarten Menheere",
+        preprodUptime: { month: 1, days: "01100101000111" }
+      }], upsert: true)
+      {
+          dno {
+          id
+          name
+          preprodUptime { month days }            
+          }
+      }
+      }
+
+
+
+mutation {
+  addUptime(
+    input: [
+      {dno:{      
+        preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"}
+        month: 3, 
+            days: "does this work"}]
+    upsert: true
+  ) {
+    uptime {
+        month
+        days
+      }
+    }
+  }
+
+
+query { getDno ( preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt")
+  {
+    name
+    hardware
+    preprodWallet
+    preprodUptime(filter: {month: {eq: 2}})
+      {
+      	month
+        days
+      }
+  }
+}
+
+
+query { getUptime ( month: 1)
+  {
+    days
+    dno(filter: {preprodWallet: {eq: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"}})
+      {
+      	hardware
+        name
+      }
+  }
+}
+
+
+
+mutation { deleteUptime (filter: { month: {eq: 3}})
+  {
+    msg
+    uptime {
+      month
+      days
+    }
+}
+}

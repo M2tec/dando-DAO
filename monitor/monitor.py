@@ -5,20 +5,19 @@ import requests
 import time
 import json
 import random
+from calendar import monthrange
 
 def remove_newlines(text):
     text = text.replace('\n', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
     return text
 
-def graphql_query(database_url, query, variables=""):
+def graphql_query(database_url, query, variables="{}"):
     print("\nQuery :\n\n" + query + "\n===================\n")
-    #print("Variables :\n\n" + variables + "\n===================\n")
+    print("Variables :\n\n" + variables + "\n===================\n")
 
     query = remove_newlines(query)
     variables = remove_newlines(variables)
     variables = json.loads(variables)
-    #print("v", variables)
-    #myjson={"query": query, "variables": variables}
     myjson={"query": query, "variables": variables}
     
     print(myjson)
@@ -36,9 +35,6 @@ def graphql_query(database_url, query, variables=""):
     return r.json()
 
 def query_dno(dno_url):
-
-    
-    
 
     # GraphQL
     dno_url = dno_url.removesuffix('/') + "/cardano-graphql" 
@@ -95,16 +91,32 @@ def query_governance(dno_url):
     
     return node_urls
 
-def uptimes_month():
-    uptimes = ""
-    for i in range(0, 30):
-        result = random.randint(0, 1)
-        uptimes = uptimes + str(result)
+def uptimes_month(i):
 
+    current_day = 1
+
+    empty_month_array = ""
+
+    if current_day == 1:
+
+        
+        length = monthrange(2025, i)[1]
+        print(length)
+        empty_month_array = "0" * length
+
+    uptimes = list(empty_month_array)
+    
+    for i in range(0, length - 15):
+        result = random.randint(1, 2)
+
+        uptimes[i] = str(result)
+
+    print(uptimes)
+    uptimes = "".join(uptimes)
     return uptimes
 
 
-def update_uptime(governance_url, preprodWallet):
+def update_puptime(governance_url, preprodWallet):
     print("update uptime")
     
     uptimes = []
@@ -126,19 +138,50 @@ def update_uptime(governance_url, preprodWallet):
     uptimes = str(uptimes).replace("\'", "\"") 
 
     variables = """
-{{
-  "patch": {{
-    "filter": {{
-      "preprodWallet": {{"eq": "{preprodWallet}"}}}},
-    "set": {{
-      "pUptime": {uptimes}
-    }}
-  }}
-}}""".format(preprodWallet=preprodWallet, uptimes=uptimes)
-
-
+    {
+    "patch": {
+        "filter": {
+        "preprodWallet": {"eq": "%s"}},
+        "set": {
+        "pUptime": %s}
+        }
+    }
+    }""" % (preprodWallet, uptimes)
 
     r = graphql_query(governance_url, query, variables)
+
+def update_preprod_uptime(governance_url, preprodWallet, month, day):
+    print("update uptime")
+    
+    uptimes = []
+    for i in range(1, 4):
+        uptime = uptimes_month(i)
+        uptimes.append(uptime)
+
+    print(uptimes)
+
+    query = """mutation {
+  addUptime(
+    input: [
+      {dno:{      
+        preprodWallet: "%s"}
+        month: %s, 
+            days: "%s"}]
+    upsert: true
+  ) {
+    uptime {
+        month
+        days
+      }
+    }
+  }""" % (preprodWallet, month, uptimes[0])
+
+
+
+
+    r = graphql_query(governance_url, query)
+    print(r)
+
 
 def main():
     # parser = argparse.ArgumentParser(description="Update GraphQL schema on a Dgraph server.")
@@ -149,11 +192,10 @@ def main():
     governance_url = "http://localhost:28080/graphql"
     # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
 
-    preprodWallet = "addr_test1qpx2egjz2f3kknme2hymcxa46v22th5ht8t82saus228amts4jafwx022df7r4c0x9gcqcctcxd4yxtuft8yxmsjqcuqc3f5tg"
-    update_uptime(governance_url, preprodWallet)
-
-    
-
+    preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    update_preprod_uptime(governance_url, preprodWallet, 1, "11100111")
+    update_preprod_uptime(governance_url, preprodWallet, 2, "11100111")
+    update_preprod_uptime(governance_url, preprodWallet, 3, "11100111")
     #dno_urls = query_governance(governance_url)
     # print(dno_urls)
 

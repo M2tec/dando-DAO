@@ -2,10 +2,10 @@ type Dno {
   id: ID!
   name: String @search
   mainnetWallet: String @id
-  preprodWallet: String! @id
+  preprodWallet: String! @id @search(by: [term, fulltext])
   hardware: String
   preprodUrl: String
-  preprodUptime: [Uptime]
+  preprodUptime: [Uptime] @hasInverse(field: dno )
   pUptime: [String]
   mainnetUrl: String
   mainnetUptime: [Uptime]
@@ -13,8 +13,9 @@ type Dno {
 }
 
 type Uptime {
-  month: Month!
+  month: Int! @id
   days: String!
+  dno: Dno! 
 }
 
 enum Tag {
