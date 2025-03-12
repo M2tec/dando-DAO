@@ -58,6 +58,34 @@ query {
 
     }
 
+    function handleDeleteUptime() {
+        const fetchData = async () => {
+
+            let gq = `
+
+            mutation { deleteUptime (filter: { month: {ge: 0}})
+            {
+              msg
+              uptime {
+                month
+                days
+              }
+          }
+          }         
+            `
+            let gqlData = await handleQuery(gq)
+
+            // console.log(gqlData)
+            let dData = gqlData.data.queryDno;
+            // console.log(dData)
+            setDnoData(dData);
+        }
+
+        fetchData()
+            .catch(console.error);
+
+    }
+
     async function handleUpdateData(e) {
         console.log("Update")
 
@@ -131,10 +159,12 @@ mutation { addDno(input: [
 
     function DnoListData(props) {
 
+        if (isEmpty(dnoData)) {
+            return (<></>)
+        }
+
         console.log("Props", props)
         let dnoList = props.dnoData
-
-
 
         if (isEmpty(dnoList)) {
             return (<></>)
@@ -155,55 +185,75 @@ mutation { addDno(input: [
         console.log(months); // "September"
 
         console.log("dnoList", dnoList)
-        const DnoItems = dnoList.map((item, index) => // { console.log("item", item.uptimes.uptimeData[0])}
+        const DnoItems = dnoList.map((dno, index) => // { console.log("dno", dno.uptimes.uptimeData[0])}
         {
-            if (item.preprodUptime === undefined || item.preprodUptime.length == 0) {
+            if (dno.preprodUptime === undefined || dno.preprodUptime.length == 0) {
                 console.log("undefined")
 
-                let up = [{ month: 1, days: "111" }, { month: 2, days: "000" }, { month: 3, days: "000" },]
-                item["preprodUptime"] = up
-                console.log(item)
+                let up = [{ month: 1, days: "222" }, { month: 2, days: "000" }, { month: 3, days: "000" },]
+                dno["preprodUptime"] = up
+                console.log(dno)
+            } 
+
+            console.log(dno.preprodUptime.length)
+
+            let missingData = 3 - dno.preprodUptime.length
+        
+            var missingDataArray = [];
+
+            for (var i = 1; i <= missingData; i++) {
+               missingDataArray.push({month: 0, days: "0"});
             }
 
+            let uptimes = [...missingDataArray, ...dno.preprodUptime]
 
-            let dayToDoArrays = []
-            for (let i = 0; i < 3; i++) {
+            console.log("uptimes", uptimes)
+            dno.preprodUptime.forEach((monthData,index) => {
+                console.log(monthData)
+                if (monthData.length == 0) {
+                    dno.preprodUptime[index] = { month: 2, days: "000" }
+                }
+            });
+
+            console.log("xx", dno.preprodUptime)
+            // let dayToDoArrays = []
+            // for (let i = 0; i < 3; i++) {
                 
-                let upDays = item.preprodUptime[i].days
-                let numberOfUpDays = upDays.length
+            //     let upDays = dno.preprodUptime[i].days
+            //     let numberOfUpDays = upDays.length
 
-                let daysToDo = months[i].numberOfDays = numberOfUpDays;
-                let dayToDoArray = new Array(daysToDo).fill(-1);
-                dayToDoArrays.push(dayToDoArray)
-            }
+            //     let daysToDo = months[i].numberOfDays = numberOfUpDays;
+            //     let dayToDoArray = new Array(daysToDo).fill(-1);
+            //     dayToDoArrays.push(dayToDoArray)
+            // }
 
-            console.log("x---", item.preprodUptime[0].days)
+            console.log("x---", dno.preprodUptime[0].days)
 
             return (
                 <div key={index} className='row m-0 mb-2'>
                     <div className='col-3 px-0'>
                         <div className='d-flex justify-content-between'>
-                            <div className='mt-1'>{item.name}</div>
+                            <div className='mt-1'>{dno.name}</div>
                         </div>
                     </div>
                     <div className='col-3 px-1'>
                         <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                             <ProcessMonth
-                                uptimeData={item.preprodUptime[0].days}
+                                uptimeData={uptimes[0].days}
                                  />
                         </div>
                     </div>
                     <div className='col-3 px-1'>
                         <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                             <ProcessMonth
-                                uptimeData={item.preprodUptime[1].days}
+                                uptimeData={uptimes[1].days}
                                 />
                         </div>
                     </div>
                     <div className='col-3 px-1'>
                         <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
                             <ProcessMonth
-                                uptimeData={item.preprodUptime[2].days}
+                                uptimeData={uptimes[2].days}
                                 />
                         </div>
                     </div>
@@ -243,7 +293,7 @@ mutation { addDno(input: [
                 <DnoListData dnoData={dnoData} />
 
                 <button type="button" onClick={handleCheckUptime} className="btn btn-primary">Update dno data</button>
-
+                <button type="button" onClick={handleDeleteUptime} className="btn btn-primary mx-3">Delete data</button>
             </div>
         </>
     )
