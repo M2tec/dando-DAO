@@ -24,9 +24,9 @@ def graphql_query(database_url, query, variables="{}"):
     print(myjson)
     try:
         r = requests.post(database_url, json=myjson)
-        print(r)
-        print(r.headers)
-        print(json.dumps(r.json(), indent=2))
+        # print(r)
+        # print(r.headers)
+        # print(json.dumps(r.json(), indent=2))
     except requests.exceptions.ConnectionError as e:
         print(e)
         # print(json.dumps(r.json(), indent=2))
@@ -224,50 +224,56 @@ def update_preprod_uptime_today(governance_url, preprodWallet, month, day, resul
     print("day:" + str(day))
     print("update uptime")
     
-    if day == 1:
-        length = monthrange(2025, month)[1]
-        print(length)
-        empty_month_array = "0" * length
-
-
-    query = """query { 
-    queryDno { 
-        id 
-        name 
-        preprodWallet
-        preprodUptime { month, days}
-    }
-    }"""
-
-    r = graphql_query(governance_url, query)
-
-    preprodUptime = r["data"]["queryDno"][0]["preprodUptime"]
-    print(preprodUptime)
-
     uptimes = ""
-
-    if len(preprodUptime) == 0:
+    # When this is the first day of the month there is no uptime data yet
+    # so create an empty string of uptimes
+    if day == 1:
+        print("First day of the month generating emtpy uptime string")
         empty_day_array = set_empty_month(governance_url, preprodWallet, month)
         uptimes = empty_day_array
+    else:
+        # Get current uptime data
+        print("Checking for current uptime data")
+        query = """query { 
+        queryDno { 
+            id 
+            name 
+            preprodWallet
+            preprodUptime { month, days}
+        }
+        }"""
 
+        r = graphql_query(governance_url, query)
 
-    print("p" + str(preprodUptime))
-    print(month)
-
-    for monthdata in preprodUptime:
-        print(monthdata)
-        if monthdata["month"] == month:
-            print("it is : " + str(month))
-            uptimes = list(monthdata["days"])
-
-
+        preprodUptime = r["data"]["queryDno"][0]["preprodUptime"]
+        print("Current uptime data: " + str(preprodUptime))
     
-    uptimes[day-1] = str(result)
+        if len(preprodUptime) == 0:
+            empty_day_array = set_empty_month(governance_url, preprodWallet, month)
+            uptimes = empty_day_array
+        else:             
+            for monthdata in preprodUptime:
+                print(monthdata)
+                if monthdata["month"] == month:
+                    print("it is : " + str(month))
+                    uptimes = monthdata["days"]
 
-    uptimes = "".join(uptimes)
+    # Ok we made sure we have an uptime array with data
+    # Now lets modify the current day to fill it with uptime data
+
+
+    uptimesArray = list(uptimes)
+
+
+    print(uptimesArray)
+    print(uptimesArray[day-1])
+    uptimesArray[day-1] = str(result)
+
+    uptimes = "".join(uptimesArray)
 
     print(uptimes)
 
+    # Store the result 
     query = """mutation {
   addUptime(
     input: [

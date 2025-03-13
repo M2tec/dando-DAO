@@ -1,5 +1,6 @@
-/node_modules
-/database/data
-/data
-/dist
-/temp
+node_modules/
+database/data/
+data/
+dist/
+temp/
+user_data/
