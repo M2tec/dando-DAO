@@ -149,3 +149,39 @@ mutation updateDno( $patch:  UpdateDnoInput!) {
           }
       }
       }
+
+
+mutation {
+  addDno(
+    input: [
+      {
+        name: "Maarten M | M2tec",
+        preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+        mainnetWallet: "$m2tec",
+        preprodUrl: "https://preprod-sunflower.m2tec.nl/",
+        mainnetUrl: "https://mainnet-sunflower.m2tec.nl/"
+      },
+      {
+        name: "q",
+        preprodWallet: "addr_test1qq4gyf6jalkh0p5uvnuvjdnspzulzyzm79antq42zduvlgddqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q5t4dpq",
+        mainnetWallet: "$quasar",
+        preprodUrl: null,
+        mainnetUrl: null
+      },
+      {
+        name: "PEACEpool dandeli0n",
+        preprodWallet: "addr_test1qqs96h3jdydyeplsvampynrh7fwy4txr4kp2mu4pxf7xzqadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6qkr75h0",
+        mainnetWallet: "addr1qxyh3m7vwdw79rw97m0lghjxhhk9pjmsn6dfe2ms2m043ppvrzdp4wcghqx83fez83rz9t0lzjtqn3ug5ujnuugq4jpq39tkw2",
+        preprodUrl: "https://preprod-lite.dandelion.link/",
+        mainnetUrl: "https://mainnet-lite.dandelion.link/"
+      }
+    ]
+    upsert: true
+  ) {
+    dno {
+      id
+      name
+      preprodWallet
+    }
+  }
+}

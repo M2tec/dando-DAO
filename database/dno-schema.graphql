@@ -15,7 +15,7 @@ type Dno {
 type Uptime {
   month: Int! @id
   days: String!
-  dno: Dno! 
+  dno: [Dno!]
 }
 
 enum Tag {

@@ -7,13 +7,16 @@ import json
 import random
 from calendar import monthrange
 import random
+import pprint
+pp = pprint.PrettyPrinter(depth=4)
+from datetime import datetime,timezone
 
 def remove_newlines(text):
     text = text.replace('\n', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
     return text
 
 def graphql_query(database_url, query, variables="{}"):
-    # print("\nQuery :\n\n" + query + "\n===================\n")
+    #print("\nQuery :\n\n" + query + "\n===================\n")
     # print("Variables :\n\n" + variables + "\n===================\n")
 
     query = remove_newlines(query)
@@ -21,9 +24,11 @@ def graphql_query(database_url, query, variables="{}"):
     variables = json.loads(variables)
     myjson={"query": query, "variables": variables}
     
-    print(myjson)
+    return_data = ""
+    # print(myjson)
     try:
         r = requests.post(database_url, json=myjson)
+        return_data = r.json()
         # print(r)
         # print(r.headers)
         # print(json.dumps(r.json(), indent=2))
@@ -33,14 +38,14 @@ def graphql_query(database_url, query, variables="{}"):
     except json.decoder.JSONDecodeError as e:
         print(e)
     
-    return r.json()
+    return return_data
 
 def query_dno(dno_url):
 
+    is_OK = 1 # 0 is no data, 1 is query failed and 2 is query succeeded
+
     # GraphQL
     dno_url = dno_url.removesuffix('/') + "/cardano-graphql" 
-    print("\nQuery dno at: " + dno_url)
-    print("\nQuery tip:")
     
     query = """query { cardano
     { tip 
@@ -52,140 +57,49 @@ def query_dno(dno_url):
     """
 
     r = graphql_query(dno_url, query)
-    print(r)
+    if type(r) == dict:
+        if "slotNo" in r["data"]["cardano"]["tip"]:
+            is_OK = 2
 
-    # koios 
-
-    return True
+    # koios   
+    print(dno_url + "\t\t" + str(is_OK))
+    return is_OK
 
 def testing_query_dno(dno_url):
     return random.randint(1, 2)
 
+def get_dno_data(governance_url):
 
-def query_governance(dno_url):
-    print(dno_url)
-    print("\nQuery tip:\n")
-    
     query = """query { 
     queryDno { 
         name
         preprodWallet
         mainnetWallet
         preprodUrl
-        preprodUptime
+        preprodUptime { month, days }
       	mainnetUrl
-        mainnetUptime
+        mainnetUptime { month, days }
     }
 }         
     """
 
-    r = graphql_query(dno_url, query)
+    r = graphql_query(governance_url, query)
 
-    print(r)
+    # print("\nResult ===================")
+    # print(r)
 
     dno_datas = r["data"]["queryDno"]
 
-    node_urls = []
+    # node_urls = []
 
-    for dno_data in dno_datas:
-        preprodWallet = dno_data["preprodWallet"]
-        preprodUrl = dno_data["preprodUrl"]
-        mainentUrl = dno_data["mainnetUrl"]
-        node_url = { "preprodWallet": preprodWallet, "preprod": preprodUrl , "mainnet": mainentUrl}   
-        node_urls.append(node_url)
+    # for dno_data in dno_datas:
+    #     preprodWallet = dno_data["preprodWallet"]
+    #     preprodUrl = dno_data["preprodUrl"]
+    #     mainentUrl = dno_data["mainnetUrl"]
+    #     node_url = { "preprodWallet": preprodWallet, "preprod": preprodUrl , "mainnet": mainentUrl}   
+    #     node_urls.append(node_url)
     
-    return node_urls
-
-def uptimes_month(i):
-
-    current_day = 1
-
-    empty_month_array = ""
-
-    if current_day == 1:
-
-        
-        length = monthrange(2025, i)[1]
-        print(length)
-        empty_month_array = "0" * length
-
-    uptimes = list(empty_month_array)
-    
-    for i in range(0, length - 15):
-        result = random.randint(1, 2)
-
-        uptimes[i] = str(result)
-
-    print(uptimes)
-    uptimes = "".join(uptimes)
-    return uptimes
-
-
-def update_puptime(governance_url, preprodWallet):
-    print("update uptime")
-    
-    uptimes = []
-    for i in range(0, 3):
-        uptime = uptimes_month()
-        uptimes.append(uptime)
-
-    print(uptimes)
-
-    query = """mutation updateDno( $patch:  UpdateDnoInput!) {
-  	updateDno(input: $patch) {
-    dno {
-      preprodWallet
-      pUptime
-        }
-    }
-    }"""
-    
-    uptimes = str(uptimes).replace("\'", "\"") 
-
-    variables = """
-    {
-    "patch": {
-        "filter": {
-        "preprodWallet": {"eq": "%s"}},
-        "set": {
-        "pUptime": %s}
-        }
-    }
-    }""" % (preprodWallet, uptimes)
-
-    r = graphql_query(governance_url, query, variables)
-
-def update_preprod_uptime(governance_url, preprodWallet, month, day):
-    print("update uptime")
-    
-    uptimes = []
-    for i in range(1, 4):
-        uptime = uptimes_month(i)
-        uptimes.append(uptime)
-
-    print(uptimes)
-
-    query = """mutation {
-  addUptime(
-    input: [
-      {dno:{      
-        preprodWallet: "%s"}
-        month: %s, 
-            days: "%s"}]
-    upsert: true
-  ) {
-    uptime {
-        month
-        days
-      }
-    }
-  }""" % (preprodWallet, month, uptimes[0])
-
-
-
-
-    r = graphql_query(governance_url, query)
-    print(r)
+    return dno_datas
 
 def set_empty_month(governance_url, preprodWallet, month):
 
@@ -216,10 +130,55 @@ def set_empty_month(governance_url, preprodWallet, month):
     print(r)
 
     return empty_month_array
+
+def fill_mock_data(governance_url):
+
     
+    query = """mutation {
+  addDno(
+    input: [
+      {
+        name: "Maarten M | M2tec",
+        preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+        mainnetWallet: "$m2tec",
+        preprodUrl: "https://preprod-sunflower.m2tec.nl/",
+        mainnetUrl: "https://mainnet-sunflower.m2tec.nl/"
+      },
+      {
+        name: "q",
+        preprodWallet: "addr_test1qq4gyf6jalkh0p5uvnuvjdnspzulzyzm79antq42zduvlgddqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q5t4dpq",
+        mainnetWallet: "$quasar",
+        preprodUrl: null,
+        mainnetUrl: null
+      },
+      {
+        name: "PEACEpool dandeli0n",
+        preprodWallet: "addr_test1qqs96h3jdydyeplsvampynrh7fwy4txr4kp2mu4pxf7xzqadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6qkr75h0",
+        mainnetWallet: "addr1qxyh3m7vwdw79rw97m0lghjxhhk9pjmsn6dfe2ms2m043ppvrzdp4wcghqx83fez83rz9t0lzjtqn3ug5ujnuugq4jpq39tkw2",
+        preprodUrl: "https://preprod-lite.dandelion.link/",
+        mainnetUrl: "https://mainnet-lite.dandelion.link/"
+      }
+    ]
+    upsert: true
+  ) {
+    dno {
+      id
+      name
+      preprodWallet
+    }
+  }
+}""" 
 
 
-def update_preprod_uptime_today(governance_url, preprodWallet, month, day, result):
+
+    r = graphql_query(governance_url, query)
+    print(r)
+
+def update_uptime_today(governance_url, preprodWallet, resultPreprod, resultMainnet):
+    day = int(datetime.now(timezone.utc).strftime('%d'))
+    month = int(datetime.now(timezone.utc).strftime('%m'))
+    day = 4
+    # month = 5
     print("month:" + str(month))
     print("day:" + str(day))
     print("update uptime")
@@ -234,40 +193,50 @@ def update_preprod_uptime_today(governance_url, preprodWallet, month, day, resul
     else:
         # Get current uptime data
         print("Checking for current uptime data")
-        query = """query { 
-        queryDno { 
-            id 
-            name 
+
+        query = """{
+        getDno(preprodWallet: "%s") {
+            name
             preprodWallet
-            preprodUptime { month, days}
+            preprodUptime {
+            month
+            days
+            }
+            mainnetWallet
+            mainnetUptime {
+            month
+            days
+            }
         }
-        }"""
+        }""" % (preprodWallet)
 
         r = graphql_query(governance_url, query)
+        # print(r)
 
-        preprodUptime = r["data"]["queryDno"][0]["preprodUptime"]
-        print("Current uptime data: " + str(preprodUptime))
-    
-        if len(preprodUptime) == 0:
+        preprodUptimes = r["data"]["getDno"]["preprodUptime"]
+        print("Current uptime data: \n" + str(preprodUptimes))
+
+        if len(preprodUptimes) == 0:
             empty_day_array = set_empty_month(governance_url, preprodWallet, month)
             uptimes = empty_day_array
-        else:             
-            for monthdata in preprodUptime:
-                print(monthdata)
-                if monthdata["month"] == month:
-                    print("it is : " + str(month))
-                    uptimes = monthdata["days"]
+        else:
+            for uptime in preprodUptimes:
+                if uptime["month"] == month:
+                    print("month is in data")
+                    uptimes = uptime['days']
+                else:
+                    print("month is not in data")
+                    uptimes = set_empty_month(governance_url, preprodWallet, month)
 
     # Ok we made sure we have an uptime array with data
     # Now lets modify the current day to fill it with uptime data
 
-
+    # print("Uptimes" + uptimes)
     uptimesArray = list(uptimes)
-
-
-    print(uptimesArray)
-    print(uptimesArray[day-1])
-    uptimesArray[day-1] = str(result)
+    
+    # print(uptimesArray)
+    # print(uptimesArray[day-1])
+    uptimesArray[day-1] = str(resultPreprod)
 
     uptimes = "".join(uptimesArray)
 
@@ -275,59 +244,85 @@ def update_preprod_uptime_today(governance_url, preprodWallet, month, day, resul
 
     # Store the result 
     query = """mutation {
-  addUptime(
-    input: [
-      {dno:{      
-        preprodWallet: "%s"}
-        month: %s, 
+    addUptime(
+        input: [
+        {dno:{      
+            preprodWallet: "%s"}
+            month: %s, 
             days: "%s"}]
-    upsert: true
-  ) {
-    uptime {
-        month
-        days
-      }
-    }
-  }""" % (preprodWallet, month, uptimes)
+        upsert: true
+    ) {
+        uptime {
+            dno { name, preprodWallet}
+            month
+            days
+        }
+        }
+    }""" % (preprodWallet, month, uptimes)
+    
+    print(query)
 
     r = graphql_query(governance_url, query)
-    print(r)
+    # print("### Result")
+    # print(r)
 
 def main():
-    # parser = argparse.ArgumentParser(description="Update GraphQL schema on a Dgraph server.")
-    # parser.add_argument("gov_url", help="Dando governance database URL (e.g., http://alpha:8080/graphql)")
+    parser = argparse.ArgumentParser(description="Monitor Dandelion node uptime.")
+    parser.add_argument("env",  nargs='?', default=".env.development", help="Provide the environment file (e.g., .env.development)")
+    args = parser.parse_args()
 
-    # args = parser.parse_args()
+
+    environment_file = args.env
+    # print(environment_file)
+
+    # Open the file and read its content.
+    with open(environment_file) as f:
+        content = f.readlines()
+
+    # Display the file's content line by line.
+
+    environment_data = {}
+    for line in content:
+        variable = line.split('=', 1)[0]
+        value = line.split('=', 1)[1].replace('\n', '').replace('"', '')
+
+        environment_data[variable] = value
+        # print(environment_data)
+
     #governance_url = "http://dgraph.m2tec.nl/graphql"
-    governance_url = "http://localhost:28080/graphql"
-    # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
-    preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    #governance_url = "http://localhost:28080/graphql"
+
+    governance_url = environment_data['VITE_GRAPH_URL']
+
+
+    dno_data = get_dno_data(governance_url)
     
-    # let date = currentdate
+    pp.pprint(dno_data)   
+    # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
+    # preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    for dno in dno_data:
+        # print(dno["preprodUrl"])
+        if dno["preprodUrl"] != None:
+            print("\n" + dno["name"])
+            resultPreprod = query_dno(dno["preprodUrl"])
+            # print("Preprod: " + str(result))
+            resultMainnet = query_dno(dno["mainnetUrl"])
+            # print("Mainnet: " + str(result))
+            update_uptime_today(governance_url, dno["preprodWallet"], resultPreprod, resultMainnet)
+            # break
+    
+    #fill_mock_data(governance_url)
 
-    for month in range(1,4):
+    def cycle_fill_uptime_data():
+        for month in range(1,4):
 
-        length = monthrange(2025, month)[1]
+            length = monthrange(2025, month)[1]
 
-        for day in range(1,length+1):
-            result = testing_query_dno(dno_url="test")
-            update_preprod_uptime_today(governance_url, preprodWallet, month, day, result)
-            
-            time.sleep(2)
-
-    # update_preprod_uptime(governance_url, preprodWallet, 2, "11100111")
-    # update_preprod_uptime(governance_url, preprodWallet, 3, "11100111")
-    #dno_urls = query_governance(governance_url)
-    # print(dno_urls)
-
-    # for dno_url in dno_urls:
-    #     dno_url["preprod"]
-    #     print(dno_url)
-
-    # dno_healty = query_dno(dno_url)
-
-    # if (dno_healty):
-    #     print("He is good")
+            for day in range(1,length+1):
+                result = testing_query_dno(dno_url="test")
+                #update_uptime_today(governance_url, preprodWallet, month, day, result)
+                
+                time.sleep(2)
 
 
 if __name__ == "__main__":

@@ -190,7 +190,7 @@ mutation { addDno(input: [
             if (dno.preprodUptime === undefined || dno.preprodUptime.length == 0) {
                 console.log("undefined")
 
-                let up = [{ month: 1, days: "222" }, { month: 2, days: "000" }, { month: 3, days: "000" },]
+                let up = [{ month: 1, days: "000" }, { month: 2, days: "000" }, { month: 3, days: "000" },]
                 dno["preprodUptime"] = up
                 console.log(dno)
             } 
