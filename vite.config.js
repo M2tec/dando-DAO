@@ -18,6 +18,7 @@ export default defineConfig({
     topLevelAwait(),
     react()
   ],
+  base: "./",
   optimizeDeps: {
     esbuildOptions: {
         external: ['*.ttf'],
