@@ -225,13 +225,13 @@ mutation { addDno(input: [
                         </div>
                     </div>                    
                     <div className='col-3 px-1'>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-1 border border-black">
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-top border border-bottom-0 border-secondary">
                            <div style={{height: "18px"}} className='d-flex align-items-end p-0 px-2'>m</div>
                            <ProcessMonth
                                 uptimeData={uptimeData["MAINNET"][1]}
                                  />
                         </div>
-                        <div style={{height: "18px"}} className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
                         <div style={{height: "18px"}} className='d-flex align-items-end px-2'>p</div>
                            <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"][1]}
@@ -239,13 +239,13 @@ mutation { addDno(input: [
                         </div>
                     </div>
                     <div className='col-3 px-1'>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-1 border border-black">
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
 
                            <ProcessMonth
                                 uptimeData={uptimeData["MAINNET"][2]}
                                  />
                         </div>
-                        <div style={{height: "18px"}} className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
  
                            <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"][2]}
@@ -253,13 +253,13 @@ mutation { addDno(input: [
                         </div>
                     </div>
                     <div className='col-3 px-1'>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-1 border border-black">
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
  
                            <ProcessMonth
                                 uptimeData={uptimeData["MAINNET"][3]}
                                  />
                         </div>
-                        <div style={{height: "18px"}} className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
 
                            <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"][3]}
@@ -303,9 +303,9 @@ mutation { addDno(input: [
                 </div>
 
                 <DnoListData dnoData={dnoData} />
-
+{/* 
                 <button type="button" onClick={handleCheckUptime} className="btn btn-primary">Update dno data</button>
-                <button type="button" onClick={handleDeleteUptime} className="btn btn-primary mx-3">Delete data</button>
+                <button type="button" onClick={handleDeleteUptime} className="btn btn-primary mx-3">Delete data</button> */}
             </div>
         </>
     )
