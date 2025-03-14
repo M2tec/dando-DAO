@@ -10,20 +10,31 @@ const DNOUptimeDisplay = () => {
         const fetchData = async () => {
 
             let gq = `
-query { 
-    queryDno { 
-        id 
-        name 
-        preprodWallet
-        preprodUptime { month, days}
-    }
-}          
+                {
+                queryDno {
+                    id
+                    name
+                    mainnetWallet
+                    preprodWallet
+                    hardware
+                    services {
+                        subnet
+                        uptime(filter: {month: {in: [1, 2, 3]}}) {
+                            month
+                            days
+                        }
+                    }
+                    
+                }
+                }       
             `
             let gqlData = await handleQuery(gq)
 
             // console.log(gqlData)
+            // console.log("uptime", gqlData.data.queryDno[0].services[0].uptime)
             let dData = gqlData.data.queryDno;
-            // console.log(dData)
+
+            //console.log("dData", dData[0].services[0].uptime)
             setDnoData(dData);
         }
 
@@ -36,14 +47,21 @@ query {
         const fetchData = async () => {
 
             let gq = `
-query { 
-    queryDno { 
-        id 
-        name 
-        preprodWallet
-        preprodUptime { month, days}
-    }
-}          
+            query {
+            queryDno {
+                id
+                name
+                mainnetWallet
+                preprodWallet
+                hardware
+                services(filter: { subnet: {eq: PREPROD}}){
+                uptime(filter: { month: {in: [1,2,3]}}){
+                    month
+                    days
+                }
+                }
+            }
+            }  
             `
             let gqlData = await handleQuery(gq)
 
@@ -63,7 +81,7 @@ query {
 
             let gq = `
 
-            mutation { deleteUptime (filter: { month: {ge: 0}})
+            mutation { deleteUptime (filter: { network: {eq: CARDANO}})
             {
               msg
               uptime {
@@ -87,7 +105,7 @@ query {
     }
 
     async function handleUpdateData(e) {
-        console.log("Update")
+      // console.log("Update")
 
         let gq = `
 
@@ -119,7 +137,7 @@ mutation { addDno(input: [
         const fetchData = async () => {
 
             let gqlData = await handleQuery(gq)
-            console.log(gqlData)
+          // console.log(gqlData)
 
         }
 
@@ -127,8 +145,8 @@ mutation { addDno(input: [
             .catch(console.error);
     }
 
-    const ProcessMonth = ({ uptimeData }) => [...uptimeData].map((item, index) => {
-        // console.log(monthLeft)
+     const ProcessMonth = ( {uptimeData }) => [...uptimeData].map((item, index) => {
+        
 
         if (item == 2) {
             return (
@@ -163,98 +181,89 @@ mutation { addDno(input: [
             return (<></>)
         }
 
-        console.log("Props", props)
+      // console.log("Props", props)
         let dnoList = props.dnoData
+        // console.log("dnoList", dnoList)
 
         if (isEmpty(dnoList)) {
             return (<></>)
         }
 
-        let months = []
-        for (var i = -2; i <= 0; i += 1) {
-            let current = new Date();
-            current.setMonth(current.getMonth() + i);
-            let monthNumber = current.toLocaleString('default', { month: 'numeric' });
-            let monthName = current.toLocaleString('default', { month: 'long' });
-            let numberOfDays = daysInMonth(monthNumber, 2025)
-            let monthObj = { monthNumber: monthNumber, monthName: monthName, numberOfDays: numberOfDays }
-
-            months.push(monthObj)
-        }
-
-        console.log(months); // "September"
-
-        console.log("dnoList", dnoList)
         const DnoItems = dnoList.map((dno, index) => // { console.log("dno", dno.uptimes.uptimeData[0])}
         {
-            if (dno.preprodUptime === undefined || dno.preprodUptime.length == 0) {
-                console.log("undefined")
 
-                let up = [{ month: 1, days: "000" }, { month: 2, days: "000" }, { month: 3, days: "000" },]
-                dno["preprodUptime"] = up
-                console.log(dno)
-            } 
+            // Reorder graphQuery, feels like a hack
+            console.log("dno", dno)
+            let services = dno.services
 
-            console.log(dno.preprodUptime.length)
+            let uptimeData = {}
+            let uptime1 = {}
+            services.map((service, index) => {
+                let subnet = service.subnet
+                console.log(subnet)
 
-            let missingData = 3 - dno.preprodUptime.length
-        
-            var missingDataArray = [];
+                let uptimes = service.uptime
+                console.log("uptimes", uptimes)                
 
-            for (var i = 1; i <= missingData; i++) {
-               missingDataArray.push({month: 0, days: "0"});
-            }
+                uptimes.forEach(uptime => {
+                    console.log(uptime.month)
+                    
+                    uptime1[uptime.month] = uptime.days 
+                    uptimeData[subnet]= {...uptime1}
+                    
+                });
+            })
+            
+            console.log("uptimeData" , uptimeData["MAINNET"][1])
 
-            let uptimes = [...missingDataArray, ...dno.preprodUptime]
-
-            console.log("uptimes", uptimes)
-            dno.preprodUptime.forEach((monthData,index) => {
-                console.log(monthData)
-                if (monthData.length == 0) {
-                    dno.preprodUptime[index] = { month: 2, days: "000" }
-                }
-            });
-
-            console.log("xx", dno.preprodUptime)
-            // let dayToDoArrays = []
-            // for (let i = 0; i < 3; i++) {
-                
-            //     let upDays = dno.preprodUptime[i].days
-            //     let numberOfUpDays = upDays.length
-
-            //     let daysToDo = months[i].numberOfDays = numberOfUpDays;
-            //     let dayToDoArray = new Array(daysToDo).fill(-1);
-            //     dayToDoArrays.push(dayToDoArray)
-            // }
-
-            console.log("x---", dno.preprodUptime[0].days)
-
+                      
             return (
                 <div key={index} className='row m-0 mb-2'>
                     <div className='col-3 px-0'>
                         <div className='d-flex justify-content-between'>
                             <div className='mt-1'>{dno.name}</div>
                         </div>
-                    </div>
+                    </div>                    
                     <div className='col-3 px-1'>
-                        <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
-                            <ProcessMonth
-                                uptimeData={uptimes[0].days}
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-1 border border-black">
+                           <div style={{height: "18px"}} className='d-flex align-items-end p-0 px-2'>m</div>
+                           <ProcessMonth
+                                uptimeData={uptimeData["MAINNET"][1]}
+                                 />
+                        </div>
+                        <div style={{height: "18px"}} className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
+                        <div style={{height: "18px"}} className='d-flex align-items-end px-2'>p</div>
+                           <ProcessMonth
+                                uptimeData={uptimeData["PREPROD"][1]}
                                  />
                         </div>
                     </div>
                     <div className='col-3 px-1'>
-                        <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
-                            <ProcessMonth
-                                uptimeData={uptimes[1].days}
-                                />
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-1 border border-black">
+
+                           <ProcessMonth
+                                uptimeData={uptimeData["MAINNET"][2]}
+                                 />
+                        </div>
+                        <div style={{height: "18px"}} className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
+ 
+                           <ProcessMonth
+                                uptimeData={uptimeData["PREPROD"][2]}
+                                 />
                         </div>
                     </div>
                     <div className='col-3 px-1'>
-                        <div className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
-                            <ProcessMonth
-                                uptimeData={uptimes[2].days}
-                                />
+                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-1 border border-black">
+ 
+                           <ProcessMonth
+                                uptimeData={uptimeData["MAINNET"][3]}
+                                 />
+                        </div>
+                        <div style={{height: "18px"}} className="row m-0 mt-1 overflow-hidden rounded-1 border border-black">
+
+                           <ProcessMonth
+                                uptimeData={uptimeData["PREPROD"][3]}
+                                 />
                         </div>
                     </div>
                 </div>
@@ -276,8 +285,11 @@ mutation { addDno(input: [
             <div className='container-fluid p-0 m-0'>
                 {/* Heading */}
                 <div className='row m-0'>
-                    <div className='col-3 m-0 p-0'>
+                    <div className='col-2 m-0 p-0'>
                         <b>DNO</b>
+                    </div>
+                    <div className='col-1 m-0 p-0'>
+
                     </div>
                     <div className='col-3 m-0 px-1'>
                         <b>Januari</b>

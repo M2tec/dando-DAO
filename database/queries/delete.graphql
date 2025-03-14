@@ -1,0 +1,35 @@
+mutation {
+  deleteDno(filter: {preprodWallet: {in: 
+    ["addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+    "addr_test1qq4gyf6jalkh0p5uvnuvjdnspzulzyzm79antq42zduvlgddqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q5t4dpq",
+    "addr_test1qqs96h3jdydyeplsvampynrh7fwy4txr4kp2mu4pxf7xzqadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6qkr75h0",
+    "addr_test1qqwfs0k42vve88mw2gdl08zevk3tg44vm2up66k555sd8uau4p4s4tm6s7fr7dp6hmqxe3klu484pehqg3t50ed27jfqz046we"
+    ]
+  	}}) {
+    msg
+    dno {
+      name
+    }
+  }
+}
+
+mutation { 
+    deleteUptime (filter: { month: {eq: 1}})
+    {
+        msg
+        uptime {
+            month
+            days
+       }
+    }
+}
+
+mutation {
+    deleteService(filter: { network: {eq: CARDANO}}) 
+    {
+        msg
+        service {
+            tag
+        }
+    }
+}

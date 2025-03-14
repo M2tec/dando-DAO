@@ -2,33 +2,46 @@ import { isEmpty, handleGC } from "./Utility";
 import { Outlet, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Gear } from "react-bootstrap-icons";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
 
 const Header = () => {
   const [walletAddress, setWalletAddress] = useState("")
-  const [cookies, setCookie, removeCookie] = useCookies(['preprodWallet'])
+  // const [cookies, setCookie, removeCookie] = useCookies(['preprodWallet'])
 
   useEffect(() => {
-    console.log("cookies", cookies['preprodWallet'])
+    // console.log("cookies", cookies['preprodWallet'])
 
-    let walletAddress = cookies['preprodWallet'];
+    // let walletAddress = cookies['preprodWallet'];
 
-    if (walletAddress === null || walletAddress === undefined) {
+    // if (walletAddress === null || walletAddress === undefined) {
+
+
+    let walletAddress = JSON.parse(localStorage.getItem("login_0"));
+
+    if (walletAddress === null) {
       walletAddress = ""
     }
 
-    setWalletAddress(walletAddress)
 
-    if ('cookieStore' in window) {
-      cookieStore.addEventListener('change', (event) => {
-        event.changed.forEach(change => {
-          console.log(`Cookie '${change.name}' was ${change.removed ? 'removed' : 'changed to: ' + change.value}`);
-          setWalletAddress(change.value)
-        });
+      setWalletAddress(walletAddress)
+
+      // if ('cookieStore' in window) {
+      //   cookieStore.addEventListener('change', (event) => {
+      //     event.changed.forEach(change => {
+      //       console.log(`Cookie '${change.name}' was ${change.removed ? 'removed' : 'changed to: ' + change.value}`);
+      //       setWalletAddress(change.value)
+      //     });
+      //   });
+      // }
+
+
+
+      window.addEventListener('storage', () => {
+        console.log("StorageEvent")
+        setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
       });
-    }
 
-  }, []);
+    }, []);
 
 
   function handleLogin() {

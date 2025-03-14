@@ -1,32 +1,38 @@
 type Dno {
   id: ID!
   name: String @search
-  mainnetWallet: String @id
+  mainnetWallet: String
   preprodWallet: String! @id @search(by: [term, fulltext])
   hardware: String
-  preprodUrl: String
-  preprodUptime: [Uptime] @hasInverse(field: dno )
-  pUptime: [String]
-  mainnetUrl: String
-  mainnetUptime: [Uptime]
-  networks: [Network]
+  services: [Service] @hasInverse(field: dno )
+}
+
+type Service {
+  id: ID!
+  subnet: Subnet! @search
+  network: Network! @search
+  tag: Tag!  @search
+  url: String! 
+  uptime: [Uptime] @hasInverse(field: service )
+  dno: [Dno!] 
 }
 
 type Uptime {
-  month: Int! @id
-  days: String!
-  dno: [Dno!]
+  id: ID!
+  month: Int  @search
+  days: String
+  service: Service!
 }
 
 enum Tag {
-  MIDNIGHT
+  GENERIC
   GRAPHQL
   KOIOS
   OGMIOS
   UNIMATRIX
 }
 
-enum Name {
+enum Network {
   CARDANO
   MIDNIGHT
 }
@@ -36,18 +42,6 @@ enum Subnet {
   PREVIEW
   MAINNET
   SANCHONET
+  MIDNIGHT
 }
 
-type Service {
-  id: ID!
-  tags: Tag
-  URL: String
-}
-
-type Network {
-  id: ID!
-  blockchain: Name
-  subnet: Subnet
-  services: [Service] 
-  dno: Dno!
-}

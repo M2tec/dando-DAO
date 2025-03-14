@@ -5,7 +5,7 @@ import { handleQuery, isEmpty, DelayedInput, useDebounce } from '../components/U
 
 const Settings = () => {
   const [walletAddress, setWalletAddress] = useState("")
-  const [userDefaultData, setUserDefaultData] = useState({"name": ""})
+  const [userDefaultData, setUserDefaultData] = useState({ "name": "", "services": [{ "url": "" }, { "url": "" }] })
 
   useEffect(() => {
     console.log("Userdata", userDefaultData.name)
@@ -36,21 +36,107 @@ const Settings = () => {
         preprodWallet
         mainnetWallet
         hardware
-        preprodUrl
-        mainnetUrl
+        services {
+          subnet
+          url
+        }
       }
     }`
-      // let gqlQuery = { query: gq.replace(/\n/g, ' ') };
-      // console.log(gqlQuery)
 
-      // let gqlQuery = { query: "query { queryDno { id name address nodeUrl uptimes { uptimeData }}}" }
       let gqlData = await handleQuery(gq)
+
+      // Setup database fields when the address is not yet in the database
+      if (gqlData.data.getDno === null) {
+        console.log("No database object yet")
+
+        gq = `
+
+        mutation {
+          addDno(
+            input: [{
+              name: "", 
+              mainnetWallet: "", 
+              preprodWallet: "` + walletAddress + `", 
+              hardware: "", 
+              services: [
+                { network: CARDANO, 
+                  subnet: PREPROD, 
+                  tag: GENERIC, 
+                  url: "", 
+                  uptime: [
+                    {month: 1, days: "0"}, 
+                    {month: 2, days: "0"}, 
+                    {month: 3, days: "0"}, 
+                    {month: 4, days: "0"}, 
+                    {month: 5, days: "0"}, 
+                    {month: 6, days: "0"}, 
+                    {month: 7, days: "0"}, 
+                    {month: 8, days: "0"},
+                    {month: 9, days: "0"},
+                    {month: 10, days: "0"},
+                    {month: 11, days: "0"},
+                    {month: 12, days: "0"}]}, 
+               { network: CARDANO, 
+                  subnet: MAINNET, 
+                  tag: GENERIC, 
+                  url: "", 
+                  uptime: [
+                    {month: 1, days: "0"}, 
+                    {month: 2, days: "0"}, 
+                    {month: 3, days: "0"}, 
+                    {month: 4, days: "0"}, 
+                    {month: 5, days: "0"}, 
+                    {month: 6, days: "0"}, 
+                    {month: 7, days: "0"}, 
+                    {month: 8, days: "0"},
+                    {month: 9, days: "0"},
+                    {month: 10, days: "0"},
+                    {month: 11, days: "0"},
+                    {month: 12, days: "0"}]}
+              ]}],
+            upsert: true
+          ) {
+            dno {
+              id
+              name
+              preprodWallet
+            }
+          }
+        }
+      `
+
+        console.log(gq)
+        const fetchData = async () => {
+          await handleQuery(gq)
+        }
+
+        fetchData()
+          .catch(console.error);
+      }
+
 
       // console.log(gqlData)
       let dData = gqlData.data.getDno;
       // console.log("dData", dData)
       if (dData !== null) {
-        setUserDefaultData(dData);
+        console.log("dData", dData)
+
+        let services = {}
+        services[dData.services[0].subnet] = dData.services[0].url
+        services[dData.services[1].subnet] = dData.services[1].url
+
+        console.log("services", services)
+        let newdata = {
+          name: dData.name,
+          mainnetWallet: dData.mainnetWallet,
+          preprodWallet: dData.preprodWallet,
+          hardware: dData.hardware,
+          preprodUrl: services["PREPROD"],
+          mainnetUrl: services["MAINNET"]
+        }
+
+        console.log(newdata)
+        setUserDefaultData(newdata);
       }
     }
 
@@ -68,23 +154,64 @@ const Settings = () => {
     console.log(value)
 
     let gq = ""
-    if (field == "preprodUrl" || "mainnetUrl") {
+
+    if (field == "PREPROD" || field == "MAINNET") {
+
       gq = `
-      mutation { addDno(input: [
-      {    
-      preprodWallet: "` + address + `",
-      ` + field + `: "` + value + `"
-      }], upsert: true)
-      {
-          dno {
-          id
-          name
-          preprodWallet            
+      { 
+          queryService(filter: {subnet: {eq: ` + field + ` }})
+              {
+              id
+              url
+              dno(filter: {preprodWallet: {eq: "addr_test1qqwfs0k42vve88mw2gdl08zevk3tg44vm2up66k555sd8uau4p4s4tm6s7fr7dp6hmqxe3klu484pehqg3t50ed27jfqz046we" }}){
+                preprodWallet
+              }
           }
+      } 
+      `
+
+      async function f() {
+
+        try {
+          let response = await handleQuery(gq)
+          let serviceId = response.data.queryService[0].id
+          console.log(serviceId)
+
+          gq = `
+          mutation { 
+            updateService(
+              input: {
+                filter: { 
+                  id: ["` + serviceId + `"]}, 
+                  set: {url: "` + value + `"}
+                }
+            ) 
+            {
+              service {
+                subnet
+                network
+                id
+                tag
+              }
+            }
+          }
+          `
+
+
+          response = await handleQuery(gq)
+          console.log(response)
+
+
+
+        } catch (err) {
+          // catches errors both in fetch and response.json
+          alert(err);
+        }
       }
-      }
-    `
+
+      f();
     } else {
+
       gq = `
         mutation { addDno(input: [
         {    
@@ -100,14 +227,24 @@ const Settings = () => {
         }
         }
     `
+      async function f() {
+
+        try {
+          let response = await handleQuery(gq)
+          console.log(response)
+
+        } catch (err) {
+          // catches errors both in fetch and response.json
+          alert(err);
+        }
+      }
+
+      f();
+
+
     }
 
-    const fetchData = async () => {
-      await handleQuery(gq)
-    }
 
-    fetchData()
-      .catch(console.error);
   }
 
   const Input = (props) => {
@@ -150,42 +287,42 @@ const Settings = () => {
 
             <form>
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">Name</label>
+                <label htmlFor="dnoFormControlInput1">Name</label>
 
                 <Input
                   type="text"
                   walletAddress={walletAddress}
                   field="name"
                   className="form-control"
-                  id="exampleFormControlInput1"
+                  id="dnoFormControlInput1"
                   placeholder="Nike Hoskinson"
                   defaultValue={userDefaultData.name} />
 
               </div>
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">Mainnet wallet</label>
+                <label htmlFor="dnoFormControlInput1">Mainnet wallet</label>
 
                 <Input
                   type="text"
                   walletAddress={walletAddress}
                   field="mainnetWallet"
                   className="form-control"
-                  id="exampleFormControlInput1"
+                  id="dnoFormControlInput1"
                   placeholder="https://server1.dandelion.link"
                   defaultValue={userDefaultData.mainnetWallet}
                 />
 
-              </div> 
+              </div>
 
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">Hardware</label>
+                <label htmlFor="dnoFormControlInput1">Hardware</label>
 
                 <Input
                   type="text"
                   walletAddress={walletAddress}
                   field="hardware"
                   className="form-control"
-                  id="exampleFormControlInput1"
+                  id="dnoFormControlInput1"
                   placeholder="Atari"
                   defaultValue={userDefaultData.hardware}
                 />
@@ -193,14 +330,14 @@ const Settings = () => {
               </div>
 
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">Node Url preprod</label>
+                <label htmlFor="dnoFormControlInput1">Node Url preprod</label>
 
                 <Input
                   type="text"
                   walletAddress={walletAddress}
-                  field="preprodUrl"
+                  field="PREPROD"
                   className="form-control"
-                  id="exampleFormControlInput1"
+                  id="dnoFormControlInput1"
                   placeholder="https://preprod.dandelion.link"
                   defaultValue={userDefaultData.preprodUrl}
                 />
@@ -209,14 +346,14 @@ const Settings = () => {
 
 
               <div className="form-group mb-2">
-                <label htmlFor="exampleFormControlInput1">Node Url mainnet</label>
+                <label htmlFor="dno\FormControlInput1">Node Url mainnet</label>
 
                 <Input
                   type="text"
                   walletAddress={walletAddress}
-                  field="mainnetUrl"
+                  field="MAINNET"
                   className="form-control"
-                  id="exampleFormControlInput1"
+                  id="dnoFormControlInput1"
                   placeholder="https://mainnet.dandelion.link"
                   defaultValue={userDefaultData.mainnetUrl}
                 />

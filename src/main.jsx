@@ -5,7 +5,7 @@ import { loadModule } from './services/cardanoWasm';
 import './index.css'
 import "@fontsource/poppins/700.css";
 import "@fontsource/poppins/500.css";
-import { CookiesProvider } from 'react-cookie';
+// import { CookiesProvider } from 'react-cookie';
 
 const AppLoader = () => {
   const [cslReady, setCSLReady] = useState(null);
@@ -24,8 +24,8 @@ const AppLoader = () => {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <CookiesProvider defaultSetOptions={{ path: '/' }}>
+    {/* <CookiesProvider defaultSetOptions={{ path: '/' }}> */}
       <AppLoader />
-    </CookiesProvider>
+    {/* </CookiesProvider> */}
   </React.StrictMode>,
 )

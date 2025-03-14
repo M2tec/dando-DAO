@@ -1,0 +1,115 @@
+# Create
+mutation {
+  addDno(
+    input: [{
+      name: "Maarten Menheere", 
+      mainnetWallet: "test", 
+      preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt", 
+      hardware: "Atari", 
+      services: [
+        { network: CARDANO, 
+          subnet: PREPROD, 
+          tag: GENERIC, 
+          url: "https://preprod-sunflower.m2tec.nl/", 
+          uptime: [
+            {month: 1, days: ""}, 
+            {month: 2, days: ""}, 
+            {month: 3, days: ""}, 
+            {month: 4, days: ""}, 
+            {month: 5, days: ""}, 
+            {month: 6, days: ""}, 
+            {month: 7, days: ""}, 
+            {month: 8, days: ""},
+          	{month: 9, days: ""},
+          	{month: 10, days: ""},
+          	{month: 11, days: ""},
+          	{month: 12, days: ""}]}, 
+    ]}]
+    upsert: true
+  ) {
+    dno {
+      id
+      name
+      preprodWallet
+    }
+  }
+}
+
+# Query
+{
+  queryDno {
+    id
+    name
+    mainnetWallet
+    preprodWallet
+    hardware
+    services {
+      id
+      subnet
+      network
+      tag
+      url
+      uptime {
+        id
+        month
+        days
+      }
+    }
+  }
+}
+
+# Find id to update
+{
+  queryDno(filter:{name: {allofterms: "Maarten Menheere"}}) {
+    id
+    name
+    mainnetWallet
+    preprodWallet
+    hardware
+    services(filter: { subnet: {eq: PREPROD} and:
+    { network: { eq: CARDANO}}}) {
+      uptime(filter: { month: {eq: 1}}){
+        id
+      }
+    }
+  }
+}
+
+
+# Update
+mutation updateUptime($patch: UpdateUptimeInput!) {
+  updateUptime(input: $patch) {
+    uptime {
+      month
+      days
+    }
+  }
+}
+
+{
+  "patch": {
+    "filter": {
+      "id": [
+        "0x16"
+      ]
+    },
+    "set": {
+      "days": "1111111"
+    }
+  }
+}
+
+# delete
+mutation {
+  deleteDno(filter: {preprodWallet: {in: 
+    ["addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
+    "addr_test1qq4gyf6jalkh0p5uvnuvjdnspzulzyzm79antq42zduvlgddqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q5t4dpq",
+    "addr_test1qqs96h3jdydyeplsvampynrh7fwy4txr4kp2mu4pxf7xzqadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6qkr75h0"
+    ]
+  	}}) {
+    msg
+    dno {
+      name
+    }
+  }
+}

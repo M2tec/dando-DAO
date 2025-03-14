@@ -16,7 +16,7 @@ def remove_newlines(text):
     return text
 
 def graphql_query(database_url, query, variables="{}"):
-    #print("\nQuery :\n\n" + query + "\n===================\n")
+    print("\nQuery :\n\n" + query + "\n===================\n")
     # print("Variables :\n\n" + variables + "\n===================\n")
 
     query = remove_newlines(query)
@@ -68,27 +68,31 @@ def query_dno(dno_url):
 def testing_query_dno(dno_url):
     return random.randint(1, 2)
 
-def get_dno_data(governance_url):
+def get_dno_data(governance_url, month):
 
     query = """query { 
     queryDno { 
-        name
         preprodWallet
-        mainnetWallet
-        preprodUrl
-        preprodUptime { month, days }
-      	mainnetUrl
-        mainnetUptime { month, days }
+        services { 
+            network
+            subnet
+            url
+            uptime(filter: { month: { eq: %d }}) {
+                id
+            }
+        }
     }
 }         
-    """
+    """ % (month)
 
     r = graphql_query(governance_url, query)
 
     # print("\nResult ===================")
     # print(r)
 
-    dno_datas = r["data"]["queryDno"]
+    if type(r) == dict:
+        #print(r)
+        dno_datas = r["data"]["queryDno"]
 
     # node_urls = []
 
@@ -101,33 +105,12 @@ def get_dno_data(governance_url):
     
     return dno_datas
 
-def set_empty_month(governance_url, preprodWallet, month):
-
-    length = monthrange(2025, month)[1]
-    print(length)
+def set_empty_month():
+    month = int(datetime.now(timezone.utc).strftime('%m'))
+    year = int(datetime.now(timezone.utc).strftime('%Y'))
+    
+    length = monthrange(year, month)[1]
     empty_month_array = "0" * length
-
-    query = """mutation {
-        addUptime(
-            input: [
-            {dno:{      
-                preprodWallet: "%s"}
-                month: %s, 
-                    days: "%s"}]
-            upsert: true
-        ) {
-            uptime {
-                month
-                days
-            }
-            }
-        }""" % (preprodWallet, month, empty_month_array)
-
-
-
-
-    r = graphql_query(governance_url, query)
-    print(r)
 
     return empty_month_array
 
@@ -141,22 +124,44 @@ def fill_mock_data(governance_url):
         name: "Maarten M | M2tec",
         preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
         mainnetWallet: "$m2tec",
-        preprodUrl: "https://preprod-sunflower.m2tec.nl/",
-        mainnetUrl: "https://mainnet-sunflower.m2tec.nl/"
+        services: [
+          { 
+            network: CARDANO
+            subnet: PREPROD
+            tag: GRAPHQL
+            url: "https://preprod-sunflower.m2tec.nl/"
+          },
+          { 
+            network: CARDANO
+            subnet: MAINNET
+            tag: GRAPHQL
+            url: "https://mainnet-sunflower.m2tec.nl/"
+          }
+        ]
       },
       {
         name: "q",
         preprodWallet: "addr_test1qq4gyf6jalkh0p5uvnuvjdnspzulzyzm79antq42zduvlgddqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q5t4dpq",
-        mainnetWallet: "$quasar",
-        preprodUrl: null,
-        mainnetUrl: null
-      },
+        mainnetWallet: "$quasar"
+      }
       {
         name: "PEACEpool dandeli0n",
         preprodWallet: "addr_test1qqs96h3jdydyeplsvampynrh7fwy4txr4kp2mu4pxf7xzqadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6qkr75h0",
         mainnetWallet: "addr1qxyh3m7vwdw79rw97m0lghjxhhk9pjmsn6dfe2ms2m043ppvrzdp4wcghqx83fez83rz9t0lzjtqn3ug5ujnuugq4jpq39tkw2",
-        preprodUrl: "https://preprod-lite.dandelion.link/",
-        mainnetUrl: "https://mainnet-lite.dandelion.link/"
+        services: [
+          { 
+            network: CARDANO
+            subnet: PREPROD
+            tag: GRAPHQL
+            url: "https://preprod-lite.dandelion.link/"
+          },
+          { 
+            network: CARDANO
+            subnet: MAINNET
+            tag: GRAPHQL
+            url: "https://mainnet-lite.dandelion.link/"
+          }
+        ]
       }
     ]
     upsert: true
@@ -174,103 +179,84 @@ def fill_mock_data(governance_url):
     r = graphql_query(governance_url, query)
     print(r)
 
-def update_uptime_today(governance_url, preprodWallet, resultPreprod, resultMainnet):
-    day = int(datetime.now(timezone.utc).strftime('%d'))
-    month = int(datetime.now(timezone.utc).strftime('%m'))
-    day = 4
-    # month = 5
-    print("month:" + str(month))
-    print("day:" + str(day))
+def update_uptime_today(governance_url, uptime_id, result):
     print("update uptime")
     
-    uptimes = ""
-    # When this is the first day of the month there is no uptime data yet
-    # so create an empty string of uptimes
-    if day == 1:
-        print("First day of the month generating emtpy uptime string")
-        empty_day_array = set_empty_month(governance_url, preprodWallet, month)
-        uptimes = empty_day_array
-    else:
-        # Get current uptime data
-        print("Checking for current uptime data")
-
-        query = """{
-        getDno(preprodWallet: "%s") {
-            name
-            preprodWallet
-            preprodUptime {
-            month
-            days
-            }
-            mainnetWallet
-            mainnetUptime {
-            month
-            days
+    # Get uptime data 
+    query = """query {
+        queryUptime(
+            filter: { id: "%s"}) {
+                days
             }
         }
-        }""" % (preprodWallet)
+    """ % (uptime_id)
+    
+    print(query)
 
-        r = graphql_query(governance_url, query)
-        # print(r)
+    r = graphql_query(governance_url, query)    
 
-        preprodUptimes = r["data"]["getDno"]["preprodUptime"]
-        print("Current uptime data: \n" + str(preprodUptimes))
+    uptime_data = r["data"]["queryUptime"][0]
+    print(uptime_data)
 
-        if len(preprodUptimes) == 0:
-            empty_day_array = set_empty_month(governance_url, preprodWallet, month)
-            uptimes = empty_day_array
-        else:
-            for uptime in preprodUptimes:
-                if uptime["month"] == month:
-                    print("month is in data")
-                    uptimes = uptime['days']
-                else:
-                    print("month is not in data")
-                    uptimes = set_empty_month(governance_url, preprodWallet, month)
+    if uptime_data["days"] == "0":
+        uptimes = set_empty_month()
+        
+        print(uptimes)
+    else:
+        uptimes = uptime_data["days"]
 
-    # Ok we made sure we have an uptime array with data
-    # Now lets modify the current day to fill it with uptime data
-
-    # print("Uptimes" + uptimes)
     uptimesArray = list(uptimes)
     
-    # print(uptimesArray)
-    # print(uptimesArray[day-1])
-    uptimesArray[day-1] = str(resultPreprod)
+    print(uptimesArray)
+
+    day = int(datetime.now(timezone.utc).strftime('%d'))
+    print(uptimesArray[day-1])
+    uptimesArray[day-1] = str(result)
 
     uptimes = "".join(uptimesArray)
 
     print(uptimes)
 
     # Store the result 
-    query = """mutation {
-    addUptime(
-        input: [
-        {dno:{      
-            preprodWallet: "%s"}
-            month: %s, 
-            days: "%s"}]
-        upsert: true
-    ) {
-        uptime {
-            dno { name, preprodWallet}
+    query = """mutation updateUptime($patch: UpdateUptimeInput!) {
+        updateUptime(input: $patch) {
+            uptime {
             month
             days
+            }
         }
-        }
-    }""" % (preprodWallet, month, uptimes)
-    
-    print(query)
+        }"""
 
-    r = graphql_query(governance_url, query)
-    # print("### Result")
-    # print(r)
+    variables = """
+        {
+        "patch": {
+            "filter": {
+            "id": [
+                "%s"
+            ]
+            },
+            "set": {
+            "days": "%s"
+            }
+        }
+        }
+        """ % (uptime_id, uptimes)
+    
+    # print(query)
+
+    r = graphql_query(governance_url, query, variables)
+    print("### Result")
+    print(r)
 
 def main():
+    # governance_url = "http://dgraph.m2tec.nl/graphql"
+    # governance_url = "http://localhost:28080/graphql"
+    # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
+    # preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    
     parser = argparse.ArgumentParser(description="Monitor Dandelion node uptime.")
     parser.add_argument("env",  nargs='?', default=".env.development", help="Provide the environment file (e.g., .env.development)")
     args = parser.parse_args()
-
 
     environment_file = args.env
     # print(environment_file)
@@ -288,28 +274,48 @@ def main():
 
         environment_data[variable] = value
         # print(environment_data)
-
-    #governance_url = "http://dgraph.m2tec.nl/graphql"
-    #governance_url = "http://localhost:28080/graphql"
-
+    
     governance_url = environment_data['VITE_GRAPH_URL']
 
-
-    dno_data = get_dno_data(governance_url)
+    month = int(datetime.now(timezone.utc).strftime('%m'))
+    dno_data = get_dno_data(governance_url, month)
     
+    # print("\n")
     pp.pprint(dno_data)   
-    # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
-    # preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
+    # print("\n\n")
+    
     for dno in dno_data:
-        # print(dno["preprodUrl"])
-        if dno["preprodUrl"] != None:
-            print("\n" + dno["name"])
-            resultPreprod = query_dno(dno["preprodUrl"])
-            # print("Preprod: " + str(result))
-            resultMainnet = query_dno(dno["mainnetUrl"])
-            # print("Mainnet: " + str(result))
-            update_uptime_today(governance_url, dno["preprodWallet"], resultPreprod, resultMainnet)
-            # break
+
+        for service in dno["services"]:
+            if service["subnet"] == "PREPROD": 
+            
+                print(service)
+                uptime_id = service["uptime"][0]["id"]
+                print(uptime_id)
+                
+                if service["url"] == "":
+                    print("No URL provided")                    
+                else:
+                    result = query_dno(service["url"])
+                
+                    print("Service state: " + str(result))
+                    #result = query_dno("https://preprod-sunflower.m2tec.nl/")
+                    update_uptime_today(governance_url, uptime_id, result)
+
+            if service["subnet"] == "MAINNET": 
+            
+                print(service)
+                uptime_id = service["uptime"][0]["id"]
+                print(uptime_id)
+                if service["url"] == "":
+                    print("No URL provided")
+                else:
+                    result = query_dno(service["url"])
+                    #result = query_dno("https://mainnet-sunflower.m2tec.nl/")
+                    print("Service state: " + str(result))
+
+                update_uptime_today(governance_url, uptime_id, result)
+
     
     #fill_mock_data(governance_url)
 
