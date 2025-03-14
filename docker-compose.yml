@@ -43,6 +43,15 @@ services:
     profiles:
     - dev
 
+  monitor:
+    build:
+      context: ./monitor
+    environment:
+      - VITE_GRAPH_URL="https://dgraph.m2tec.nl/graphql"
+    profiles:
+    - dev
+    - production
+
   server:
     build:
       context: ./

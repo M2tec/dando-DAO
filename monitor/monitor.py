@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import traceback
 import requests
 import time
 import json
@@ -10,6 +9,7 @@ import random
 import pprint
 pp = pprint.PrettyPrinter(depth=4)
 from datetime import datetime,timezone
+import os
 
 def remove_newlines(text):
     text = text.replace('\n', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
@@ -254,6 +254,14 @@ def main():
     # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
     # preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
     
+
+    try:  
+        governance_url = os.environ['VITE_GRAPH_URL'].replace('"', '')
+        print("VITE_GRAPH_URL: " + governance_url)
+    except KeyError: 
+        print("VITE_GRAPH_URL not set")
+    
+
     parser = argparse.ArgumentParser(description="Monitor Dandelion node uptime.")
     parser.add_argument("env",  nargs='?', default=".env.development", help="Provide the environment file (e.g., .env.development)")
     args = parser.parse_args()
@@ -262,20 +270,22 @@ def main():
     # print(environment_file)
 
     # Open the file and read its content.
-    with open(environment_file) as f:
-        content = f.readlines()
+    try:
+        with open(environment_file) as f:
+            content = f.readlines()
+        environment_data = {}
+        for line in content:
+            variable = line.split('=', 1)[0]
+            value = line.split('=', 1)[1].replace('\n', '').replace('"', '')
 
-    # Display the file's content line by line.
-
-    environment_data = {}
-    for line in content:
-        variable = line.split('=', 1)[0]
-        value = line.split('=', 1)[1].replace('\n', '').replace('"', '')
-
-        environment_data[variable] = value
-        # print(environment_data)
+            environment_data[variable] = value
+            # print(environment_data)
     
-    governance_url = environment_data['VITE_GRAPH_URL']
+            governance_url = environment_data['VITE_GRAPH_URL']
+
+    except FileNotFoundError:
+        print("No .env.developement file ")
+    # Display the file's content line by line.
 
     month = int(datetime.now(timezone.utc).strftime('%m'))
     dno_data = get_dno_data(governance_url, month)
@@ -285,36 +295,37 @@ def main():
     # print("\n\n")
     
     for dno in dno_data:
+        if dno["services"][0] != None:
+            for service in dno["services"]:
 
-        for service in dno["services"]:
-            if service["subnet"] == "PREPROD": 
-            
-                print(service)
-                uptime_id = service["uptime"][0]["id"]
-                print(uptime_id)
+                if service["subnet"] == "PREPROD": 
                 
-                if service["url"] == "":
-                    print("No URL provided")                    
-                else:
-                    result = query_dno(service["url"])
+                    print(service)
+                    uptime_id = service["uptime"][0]["id"]
+                    print(uptime_id)
+                    
+                    if service["url"] == "":
+                        print("No URL provided")                    
+                    else:
+                        result = query_dno(service["url"])
+                    
+                        print("Service state: " + str(result))
+                        #result = query_dno("https://preprod-sunflower.m2tec.nl/")
+                        update_uptime_today(governance_url, uptime_id, result)
+
+                if service["subnet"] == "MAINNET": 
                 
-                    print("Service state: " + str(result))
-                    #result = query_dno("https://preprod-sunflower.m2tec.nl/")
+                    print(service)
+                    uptime_id = service["uptime"][0]["id"]
+                    print(uptime_id)
+                    if service["url"] == "":
+                        print("No URL provided")
+                    else:
+                        result = query_dno(service["url"])
+                        #result = query_dno("https://mainnet-sunflower.m2tec.nl/")
+                        print("Service state: " + str(result))
+
                     update_uptime_today(governance_url, uptime_id, result)
-
-            if service["subnet"] == "MAINNET": 
-            
-                print(service)
-                uptime_id = service["uptime"][0]["id"]
-                print(uptime_id)
-                if service["url"] == "":
-                    print("No URL provided")
-                else:
-                    result = query_dno(service["url"])
-                    #result = query_dno("https://mainnet-sunflower.m2tec.nl/")
-                    print("Service state: " + str(result))
-
-                update_uptime_today(governance_url, uptime_id, result)
 
     
     #fill_mock_data(governance_url)
