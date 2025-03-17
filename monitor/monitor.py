@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import logging.handlers
 import requests
 import time
 import json
@@ -248,6 +249,8 @@ def main():
 
     console = logging.StreamHandler()
     file_handler = logging.FileHandler("./logs/monitor/" + log_file_name)
+    syslog_handler = logging.handlers.SysLogHandler(address="/dev/log")
+
 
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)s %(name)s:%(lineno)d %(message)s"
@@ -255,10 +258,11 @@ def main():
 
     console.setFormatter(formatter)
     file_handler.setFormatter(formatter)
+    syslog_handler.setFormatter(formatter)
 
     logger.addHandler(console)
     logger.addHandler(file_handler)
-
+    logger.addHandler(syslog_handler)
 
     logger.info("VITE_GRAPH_URL ".ljust(25)+ " : " + governance_url)
 
@@ -300,7 +304,7 @@ def main():
                      
                     logger.info(log_name + log_subnet + log_url + log_gql)
 
-                    update_uptime_today(governance_url, uptime_id, status["query"])
+                    #update_uptime_today(governance_url, uptime_id, status["query"])
         else:
             logger.info(dno["name"].ljust(25) + " : No service URL's")
     
