@@ -310,7 +310,7 @@ def main():
                         result = query_dno(service["url"])
                     
                         print("Service state: " + str(result))
-                        #result = query_dno("https://preprod-sunflower.m2tec.nl/")
+                        result = query_dno("https://preprod-sunflower.m2tec.nl/")
                         update_uptime_today(governance_url, uptime_id, result)
 
                 if service["subnet"] == "MAINNET": 
@@ -324,8 +324,7 @@ def main():
                         result = query_dno(service["url"])
                         #result = query_dno("https://mainnet-sunflower.m2tec.nl/")
                         print("Service state: " + str(result))
-
-                    update_uptime_today(governance_url, uptime_id, result)
+                        update_uptime_today(governance_url, uptime_id, result)
 
     
     #fill_mock_data(governance_url)
