@@ -6,6 +6,9 @@ RUN apk add --no-cache  python3 \
 
 COPY ./monitor.py ./
 
+
+RUN mkdir /logs/monitor/
+
 RUN touch crontab.tmp \
     && echo '0 9 * * * /monitor.py' > crontab.tmp \
     && crontab crontab.tmp \

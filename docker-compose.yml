@@ -48,6 +48,8 @@ services:
       context: ./monitor
     environment:
       - VITE_GRAPH_URL="https://dgraph.m2tec.nl/graphql"
+    volumes:
+      - ./logs/monitor/:/logs/monitor/
     profiles:
     - dev
     - production

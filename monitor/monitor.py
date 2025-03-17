@@ -304,7 +304,7 @@ def main():
                      
                     logger.info(log_name + log_subnet + log_url + log_gql)
 
-                    #update_uptime_today(governance_url, uptime_id, status["query"])
+                    update_uptime_today(governance_url, uptime_id, status["query"])
         else:
             logger.info(dno["name"].ljust(25) + " : No service URL's")
     
