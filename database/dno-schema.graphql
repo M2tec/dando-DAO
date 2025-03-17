@@ -12,7 +12,7 @@ type Service {
   subnet: Subnet! @search
   network: Network! @search
   tag: Tag!  @search
-  url: String! 
+  url: String
   uptime: [Uptime] @hasInverse(field: service )
   dno: [Dno!] 
 }

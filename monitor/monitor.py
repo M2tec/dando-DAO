@@ -10,35 +10,48 @@ import pprint
 pp = pprint.PrettyPrinter(depth=4)
 from datetime import datetime,timezone
 import os
+import logging
+
+# Setting up the logger
+logger = logging.getLogger("monitor")
+logger.setLevel(logging.INFO)
 
 def remove_newlines(text):
     text = text.replace('\n', '').replace('  ', ' ').replace('\t', ' ').replace('  ', ' ')
     return text
 
 def graphql_query(database_url, query, variables="{}"):
-    print("\nQuery :\n\n" + query + "\n===================\n")
-    # print("Variables :\n\n" + variables + "\n===================\n")
+    logger.debug("\nQuery :\n\n" + query + "\n===================\n")
+    logger.debug("Variables :\n\n" + variables + "\n===================\n")
 
     query = remove_newlines(query)
     variables = remove_newlines(variables)
     variables = json.loads(variables)
-    myjson={"query": query, "variables": variables}
-    
+
+    myjson={"query": query , "variables": variables}
     return_data = ""
-    # print(myjson)
+    return_code = ""
     try:
         r = requests.post(database_url, json=myjson)
-        return_data = r.json()
-        # print(r)
+        logger.debug("Status: " + repr(r.status_code))
+        logger.debug("graphql_query: " + r.text)
+        return_code = r.status_code
+        return_data = r.json()      
+        
+        # print(str(r.text))
         # print(r.headers)
         # print(json.dumps(r.json(), indent=2))
     except requests.exceptions.ConnectionError as e:
-        print(e)
+        logger.info("graphql_query: Connection error: " + str(e))
+        # print(e)
         # print(json.dumps(r.json(), indent=2))
     except json.decoder.JSONDecodeError as e:
-        print(e)
+        #logger.info("graphql_query: JSON decode error " + str(e))
+        pass
+        # print(e)
     
-    return return_data
+    return_value = {"return_code": return_code, "return_data": return_data }
+    return return_value
 
 def query_dno(dno_url):
 
@@ -57,22 +70,32 @@ def query_dno(dno_url):
     """
 
     r = graphql_query(dno_url, query)
-    if type(r) == dict:
-        if "slotNo" in r["data"]["cardano"]["tip"]:
+
+    if r["return_code"] != 200:
+        pass
+        # logger.info(r["return_code"])
+
+    r_data = r["return_data"]
+
+    # print("\n\n===================")
+    # print("r_data:  " + str(r_data))
+
+    # print("===================\n\n")
+    if type(r_data) == dict:
+        if "slotNo" in r_data["data"]["cardano"]["tip"]:
             is_OK = 2
 
     # koios   
-    print(dno_url + "\t\t" + str(is_OK))
-    return is_OK
-
-def testing_query_dno(dno_url):
-    return random.randint(1, 2)
+    # logger.info(dno_url + "\t\t" + str(is_OK))
+    status = {"connection": r["return_code"], "query": is_OK}
+    return status
 
 def get_dno_data(governance_url, month):
 
     query = """query { 
     queryDno { 
         preprodWallet
+        name
         services { 
             network
             subnet
@@ -82,17 +105,20 @@ def get_dno_data(governance_url, month):
             }
         }
     }
-}         
+    }         
     """ % (month)
 
+    # print("q: " + query)
     r = graphql_query(governance_url, query)
+    # print(r)
 
+    status = r["return_code"]
     # print("\nResult ===================")
     # print(r)
 
     if type(r) == dict:
         #print(r)
-        dno_datas = r["data"]["queryDno"]
+        dno_datas = r["return_data"]["data"]["queryDno"]
 
     # node_urls = []
 
@@ -114,73 +140,8 @@ def set_empty_month():
 
     return empty_month_array
 
-def fill_mock_data(governance_url):
-
-    
-    query = """mutation {
-  addDno(
-    input: [
-      {
-        name: "Maarten M | M2tec",
-        preprodWallet: "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt",
-        mainnetWallet: "$m2tec",
-        services: [
-          { 
-            network: CARDANO
-            subnet: PREPROD
-            tag: GRAPHQL
-            url: "https://preprod-sunflower.m2tec.nl/"
-          },
-          { 
-            network: CARDANO
-            subnet: MAINNET
-            tag: GRAPHQL
-            url: "https://mainnet-sunflower.m2tec.nl/"
-          }
-        ]
-      },
-      {
-        name: "q",
-        preprodWallet: "addr_test1qq4gyf6jalkh0p5uvnuvjdnspzulzyzm79antq42zduvlgddqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q5t4dpq",
-        mainnetWallet: "$quasar"
-      }
-      {
-        name: "PEACEpool dandeli0n",
-        preprodWallet: "addr_test1qqs96h3jdydyeplsvampynrh7fwy4txr4kp2mu4pxf7xzqadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6qkr75h0",
-        mainnetWallet: "addr1qxyh3m7vwdw79rw97m0lghjxhhk9pjmsn6dfe2ms2m043ppvrzdp4wcghqx83fez83rz9t0lzjtqn3ug5ujnuugq4jpq39tkw2",
-        services: [
-          { 
-            network: CARDANO
-            subnet: PREPROD
-            tag: GRAPHQL
-            url: "https://preprod-lite.dandelion.link/"
-          },
-          { 
-            network: CARDANO
-            subnet: MAINNET
-            tag: GRAPHQL
-            url: "https://mainnet-lite.dandelion.link/"
-          }
-        ]
-      }
-    ]
-    upsert: true
-  ) {
-    dno {
-      id
-      name
-      preprodWallet
-    }
-  }
-}""" 
-
-
-
-    r = graphql_query(governance_url, query)
-    print(r)
-
 def update_uptime_today(governance_url, uptime_id, result):
-    print("update uptime")
+    # print("update uptime")
     
     # Get uptime data 
     query = """query {
@@ -191,31 +152,33 @@ def update_uptime_today(governance_url, uptime_id, result):
         }
     """ % (uptime_id)
     
-    print(query)
+    # print(query)
 
     r = graphql_query(governance_url, query)    
 
-    uptime_data = r["data"]["queryUptime"][0]
-    print(uptime_data)
+    uptime_data = r["return_data"]["data"]["queryUptime"][0]
+    # print(uptime_data)
+    if r["return_code"] != 200:
+        logger.info(r["return_code"])
 
     if uptime_data["days"] == "0":
         uptimes = set_empty_month()
         
-        print(uptimes)
+        # print(uptimes)
     else:
         uptimes = uptime_data["days"]
 
     uptimesArray = list(uptimes)
     
-    print(uptimesArray)
+    # print(uptimesArray)
 
     day = int(datetime.now(timezone.utc).strftime('%d'))
-    print(uptimesArray[day-1])
+    # print(uptimesArray[day-1])
     uptimesArray[day-1] = str(result)
 
     uptimes = "".join(uptimesArray)
 
-    print(uptimes)
+    # print(uptimes)
 
     # Store the result 
     query = """mutation updateUptime($patch: UpdateUptimeInput!) {
@@ -245,8 +208,8 @@ def update_uptime_today(governance_url, uptime_id, result):
     # print(query)
 
     r = graphql_query(governance_url, query, variables)
-    print("### Result")
-    print(r)
+    # print("### Result")
+    # print(r)
 
 def main():
     # governance_url = "http://dgraph.m2tec.nl/graphql"
@@ -255,91 +218,91 @@ def main():
     # preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
     
 
-    try:  
-        governance_url = os.environ['VITE_GRAPH_URL'].replace('"', '')
-        print("VITE_GRAPH_URL: " + governance_url)
-    except KeyError: 
-        print("VITE_GRAPH_URL not set")
-    
-
     parser = argparse.ArgumentParser(description="Monitor Dandelion node uptime.")
     parser.add_argument("env",  nargs='?', default=".env.development", help="Provide the environment file (e.g., .env.development)")
     args = parser.parse_args()
 
     environment_file = args.env
-    # print(environment_file)
 
-    # Open the file and read its content.
-    try:
-        with open(environment_file) as f:
-            content = f.readlines()
-        environment_data = {}
-        for line in content:
-            variable = line.split('=', 1)[0]
-            value = line.split('=', 1)[1].replace('\n', '').replace('"', '')
+    log_file_name = "monitor.dev.log"
+    # Check if env var is set otherwise read file
+    try:  
+        governance_url = os.environ['VITE_GRAPH_URL'].replace('"', '')
 
-            environment_data[variable] = value
-            # print(environment_data)
-    
-            governance_url = environment_data['VITE_GRAPH_URL']
+    except KeyError: 
+        try:
+            with open(environment_file) as f:
+                content = f.readlines()
+            environment_data = {}
+            for line in content:
+                variable = line.split('=', 1)[0]
+                value = line.split('=', 1)[1].replace('\n', '').replace('"', '')
 
-    except FileNotFoundError:
-        print("No .env.developement file ")
-    # Display the file's content line by line.
+                environment_data[variable] = value
+                
+                governance_url = environment_data['VITE_GRAPH_URL']
+                log_file_name = "monitor.prod.log"
 
-    month = int(datetime.now(timezone.utc).strftime('%m'))
+        except FileNotFoundError:
+            print("No .env.developement file ")
+
+    console = logging.StreamHandler()
+    file_handler = logging.FileHandler("./logs/monitor/" + log_file_name)
+
+    formatter = logging.Formatter(
+        "%(asctime)s %(levelname)s %(name)s:%(lineno)d %(message)s"
+    )
+
+    console.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(console)
+    logger.addHandler(file_handler)
+
+
+    logger.info("VITE_GRAPH_URL ".ljust(25)+ " : " + governance_url)
+
+    # Get nod operators info
+    month = int(datetime.now(timezone.utc).strftime('%m'))   
     dno_data = get_dno_data(governance_url, month)
     
     # print("\n")
-    pp.pprint(dno_data)   
+    # logger.debug(pp.pprint(dno_data))
     # print("\n\n")
     
     for dno in dno_data:
-        if dno["services"][0] != None:
+        # print(dno["name"])
+        if dno["services"][0]["url"] != None and dno["services"][1]["url"] :
             for service in dno["services"]:
-
-                if service["subnet"] == "PREPROD": 
+                uptime_id = service["uptime"][0]["id"]
+                # print(uptime_id)
                 
-                    print(service)
-                    uptime_id = service["uptime"][0]["id"]
-                    print(uptime_id)
+                if service["url"] == "":
+                    print("no URL")
+                    pass 
+                else:
                     
-                    if service["url"] == "":
-                        print("No URL provided")                    
-                    else:
-                        result = query_dno(service["url"])
-                    
-                        print("Service state: " + str(result))
-                        result = query_dno("https://preprod-sunflower.m2tec.nl/")
-                        update_uptime_today(governance_url, uptime_id, result)
+                    status = query_dno(service["url"])
 
-                if service["subnet"] == "MAINNET": 
-                
-                    print(service)
-                    uptime_id = service["uptime"][0]["id"]
-                    print(uptime_id)
-                    if service["url"] == "":
-                        print("No URL provided")
+                    if status["connection"] == 200:
+                        if status["query"] == 1:
+                            logger_result = "Fail"
+                        if status["query"] == 2:
+                            logger_result = "Pass"
                     else:
-                        result = query_dno(service["url"])
-                        #result = query_dno("https://mainnet-sunflower.m2tec.nl/")
-                        print("Service state: " + str(result))
-                        update_uptime_today(governance_url, uptime_id, result)
+                        logger_result = str(status["connection"])
 
+                        
+                    log_name = dno["name"].ljust(25) + " : "
+                    log_subnet = str(service["subnet"]).ljust(10) + " : " 
+                    log_url = str(service["url"]).ljust(45) 
+                    log_gql = "gql: " + logger_result
+                     
+                    logger.info(log_name + log_subnet + log_url + log_gql)
+
+                    update_uptime_today(governance_url, uptime_id, status["query"])
+        else:
+            logger.info(dno["name"].ljust(25) + " : No service URL's")
     
-    #fill_mock_data(governance_url)
-
-    def cycle_fill_uptime_data():
-        for month in range(1,4):
-
-            length = monthrange(2025, month)[1]
-
-            for day in range(1,length+1):
-                result = testing_query_dno(dno_url="test")
-                #update_uptime_today(governance_url, preprodWallet, month, day, result)
-                
-                time.sleep(2)
-
-
 if __name__ == "__main__":
     main()
