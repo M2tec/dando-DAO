@@ -51,7 +51,6 @@ services:
     volumes:
       - ./logs/monitor/:/logs/monitor/
     profiles:
-    - dev
     - production
 
   server:

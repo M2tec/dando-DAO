@@ -249,7 +249,7 @@ def main():
 
     console = logging.StreamHandler()
     file_handler = logging.FileHandler("./logs/monitor/" + log_file_name)
-    syslog_handler = logging.handlers.SysLogHandler(address="/dev/log")
+    # syslog_handler = logging.handlers.SysLogHandler(address="/dev/log")
 
 
     formatter = logging.Formatter(
@@ -258,11 +258,11 @@ def main():
 
     console.setFormatter(formatter)
     file_handler.setFormatter(formatter)
-    syslog_handler.setFormatter(formatter)
+    # syslog_handler.setFormatter(formatter)
 
     logger.addHandler(console)
     logger.addHandler(file_handler)
-    logger.addHandler(syslog_handler)
+    # logger.addHandler(syslog_handler)
 
     logger.info("VITE_GRAPH_URL ".ljust(25)+ " : " + governance_url)
 
