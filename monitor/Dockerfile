@@ -1,36 +1,24 @@
-FROM alpine:latest
-
-RUN apk update
-RUN apk add --no-cache  openrc \
-                        dcron \
-                        python3 \
-                        py3-requests  \
-                        nano 
+FROM ubuntu:24.04
 
 COPY ./monitor.py ./
 
+RUN apt update
+RUN apt install python3 python3-requests cron nano -y
 
 RUN mkdir -p /logs/monitor
 
-# RUN mkdir -p /var/log/cron && \
-#     mkdir /scripts && \
-#     mkdir -m 0644 -p /var/spool/cron/crontabs && \
-#     touch /var/log/cron/cron.log && \
-#     mkdir -m 0644 -p /etc/cron.d
-# RUN mkdir /var/spool/anacron
-
-
-# RUN touch crontab.tmp \
-#     && echo '0 9 * * * /monitor.py' > crontab.tmp \
-#     && crontab crontab.tmp \
-#     && rm -rf crontab.tmp
-
 RUN touch /etc/cron.d/dno_monitor \
-    && echo '0 9 * * * /monitor.py' > /etc/cron.d/dno_monitor 
-# RUN rc-service dcron start
-# CMD ["rc-service", "dcron", "start"]
-# CMD ["/usr/sbin/crond", "-f", "-d", "0"]
+    && echo 'VITE_GRAPH_URL="https://dgraph.m2tec.nl/graphql"' > /etc/cron.d/dno_monitor \
+    && echo 'LOG_FOLDER="/logs/monitor/"' >> /etc/cron.d/dno_monitor \
+    && echo '0 9 * * * root /monitor.py > /tmp/monitor.log' >> /etc/cron.d/dno_monitor 
 
-### Debugging only
-ENTRYPOINT ["tail"]
-CMD ["-f","/dev/null"]
+RUN chmod 0644 /etc/cron.d/dno_monitor && crontab /etc/cron.d/dno_monitor
+
+RUN touch /var/log/cron.log
+
+CMD ["cron", "-f"]
+
+# ENTRYPOINT ["tail"]
+# CMD ["-f","/dev/null"]
+
+

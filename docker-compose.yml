@@ -2,10 +2,10 @@ services:
   zero:
     image: dgraph/dgraph:latest
     volumes:
-      - ./data:/dgraph
+    - ./data:/dgraph
     ports:
-      - 25080:5080
-      - 26080:6080
+    - 25080:5080
+    - 26080:6080
     restart: on-failure
     command: dgraph zero --my=zero:5080
     profiles:
@@ -18,8 +18,8 @@ services:
     volumes:
       - ./data:/dgraph
     ports:
-      - 28080:8080
-      - 29080:9080
+    - 28080:8080
+    - 29080:9080
     restart: on-failure
     command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security whitelist=0.0.0.0/0
     profiles:
@@ -29,7 +29,7 @@ services:
   ratel:
     image: dgraph/ratel:latest
     ports:
-      - 28000:8000
+    - 28000:8000
     profiles:
     - dev
     
@@ -37,7 +37,7 @@ services:
     build:
       context: ./graphiql_playground
     ports:
-      - 24080:80
+    - 24080:80
     volumes:
     - ./config/graphiql-playground/default.conf:/etc/nginx/conf.d/default.conf:ro            
     profiles:
@@ -47,9 +47,10 @@ services:
     build:
       context: ./monitor
     environment:
-      - VITE_GRAPH_URL="https://dgraph.m2tec.nl/graphql"
+    - VITE_GRAPH_URL="https://dgraph.m2tec.nl/graphql"
+    - LOG_FOLDER="/logs/monitor/"
     volumes:
-      - ./logs/monitor/:/logs/monitor/
+    - ./logs/monitor/:/logs/monitor/
     profiles:
     - production
 
@@ -57,7 +58,7 @@ services:
     build:
       context: ./
     ports:
-      - "28888:80"
+    - "28888:80"
     volumes:
     - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro      
     restart: always
