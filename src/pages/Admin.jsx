@@ -48,9 +48,78 @@ const Admin = () => {
       .catch(console.error);
   }, []);
 
-  function deleteUser({ data }) {
+  function deleteUser(props) {
+    // console.log("props: ", props)
+    console.log(props)
+
+    const deleteUptime = async () => {
+
+      var uptimeString = props.uptime.length === 0 ? "" : '"' + props.uptime.join('","') + '"';
+
+      let gq = `mutation { 
+      deleteUptime (filter: { id:[${uptimeString}]})
+      {
+          msg
+          uptime {
+              month
+              days
+          }
+        }
+      }`
+      console.log(gq)
+      let gqlData = await handleQuery(gq)
+
+    }
+
+    deleteUptime()
+      .catch(console.error);
+
+
+    const deleteService = async () => {
+
+      var serviceString = props.service.length === 0 ? "" : '"' + props.service.join('","') + '"';
+
+      let gq = `mutation { 
+        deleteService (filter: { id:[${serviceString}]})
+        {
+            msg
+            service {
+                tag
+            }
+          }
+        }`
+      console.log(gq)
+      let gqlData = await handleQuery(gq)
+
+    }
+    deleteService()
+      .catch(console.error);
+
+
+    const deleteDno = async () => {
+
+      var dnoString = props.dno.length === 0 ? "" : '"' + props.dno.join('","') + '"';
+
+      let gq = `mutation { 
+          deleteDno (filter: { id:[${dnoString}]})
+          {
+              msg
+              dno {
+                name
+              }
+            }
+          }`
+      console.log(gq)
+      let gqlData = await handleQuery(gq)
+
+    }
+    deleteDno()
+      .catch(console.error);
 
   }
+
+
+
 
   function UserData({ data }) {
 
@@ -58,31 +127,33 @@ const Admin = () => {
       return (<></>)
     }
 
-    let idList = []
+    let idList = { dno: [], service: [], uptime: [] }
     const Dnos = data.map((dno, index) => // { console.log("dno", dno.uptimes.uptimeData[0])}
     {
+      console.log("data", dno)
       // Create ID list
 
-      idList.push(data.id)
+      idList["dno"].push(dno.id)
 
       for (let [key, service] of Object.entries(dno.services)) {
-        idList.push(service.id)
+        idList["service"].push(service.id)
 
         for (let [key, uptime] of Object.entries(service.uptime)) {
-          idList.push(uptime.id)
+          idList["uptime"].push(uptime.id)
         }
 
       }
 
+      console.log(idList)
       return (
         <>
-          <div key={index} className="m-3">{dno.name} 
-          <a className="btn btn-primary m-3" onClick={deleteUser} role="button">Delete user</a></div>
+          <div key={index} className="m-3">{dno.name}
+            <a className="btn btn-primary m-3" onClick={() => deleteUser(idList)} role="button">Delete user</a></div>
         </>
       )
     })
 
-    // console.log(idList)
+
     return (
       <>
         {Dnos}
@@ -91,7 +162,10 @@ const Admin = () => {
 
   }
 
-  const DownloadJSON = ({ data, fileName }) => {
+  const DownloadJSON = ({ data }) => {
+    let today = new Date().toISOString().slice(0, 10)
+    console.log(today)
+    let fileName = "userData-" + today
     const downloadJSON = () => {
       const jsonData = new Blob([JSON.stringify(data)], { type: 'application/json' });
       const jsonURL = URL.createObjectURL(jsonData);
@@ -136,7 +210,7 @@ const Admin = () => {
         data={dnoData}
         fileName={"test"}
       /><br />
-      <UserData 
+      <UserData
         data={dnoData} />
       <Footer />
 

@@ -1,5 +1,6 @@
 import Footer from '../components/Footer';
 import DNOUptimeDisplay from '../components/DNOUptimeDisplay';
+import { Link } from "react-router-dom";
 
 const M2NodeOperators = () => {
   return (
@@ -18,6 +19,7 @@ const M2NodeOperators = () => {
           </div>
         </div>
         </div>
+        <Link className="nav-link text-white" to="/admin">Admin</Link>
       <Footer />
     </>
   )
