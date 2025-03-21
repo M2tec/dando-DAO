@@ -19,7 +19,7 @@ const M2NodeOperators = () => {
           </div>
         </div>
         </div>
-         <div className="btn btn-white m-3"><Link className="text-white" to="/admin">Admin</Link></div>
+         <div className="btn btn-white m-3"><Link to="/admin">Admin</Link></div>
       <Footer />
     </>
   )
