@@ -128,7 +128,7 @@ const Admin = () => {
     };
 
     return (
-      <a className="btn btn-primary m-3" onClick={downloadJSON} role="button">Download JSON</a>
+      <a className="btn btn-primary mb-4" onClick={downloadJSON} role="button">Download JSON</a>
     );
   }
 
@@ -151,10 +151,8 @@ const Admin = () => {
   const InstallJSON = () => {
     return (
 
-      <div className="input-group w-50 m-3">
+      <div className="input-group w-50 mb-4">
         <input type="file" onChange={handleFileUpload} className="form-control" id="inputGroupFile02" />
-        <label className="input-group-text"
-          htmlFor="inputGroupFile02">Upload</label>
       </div>
     );
   }
@@ -170,8 +168,15 @@ const Admin = () => {
     {
 
       return (
-        <div key={index} className="m-3">{dno.name}
-          <a className="btn btn-primary m-3" onClick={() => deleteUser(dno.id)} role="button">Delete user</a>
+        <div key={index} className='row m-0 mb-2'>
+          <div className='col-3 mt-4 px-0'>
+            {dno.name}
+          </div>
+          
+          <div className='col-3 px-0'>
+            <a className="btn btn-primary m-3" onClick={() => deleteUser(dno.id)} role="button">Delete user</a>
+          </div>
+
         </div>
 
       )
@@ -349,7 +354,7 @@ const Admin = () => {
           `
       let gqlData = await handleQuery(gq)
       console.log(gqlData)
-      return(gqlData)
+      return (gqlData)
     }
 
     fetchData()
@@ -467,19 +472,23 @@ const Admin = () => {
 
   return (
     <>
+    <div className='m-4'>
       <DownloadJSON
         data={dnoData}
         fileName={"test"}
       />
 
       <InstallJSON />
+      <div className='container-fluid p-0 m-0'>
 
-      <UserData
-        data={dnoData} />
+        <UserData
+          data={dnoData} />
+      </div>
 
-      <a className="btn btn-primary m-3" onClick={() => deleteAllDnos()} role="button">Delete All Dnos</a>
-      <a className="btn btn-primary m-3" onClick={() => deleteAllServices()} role="button">Delete All Services</a>
-      <a className="btn btn-primary m-3" onClick={() => deleteAllUptimes()} role="button">Delete All Uptimes</a>
+      <a className="btn btn-primary" onClick={() => deleteAllDnos()} role="button">Delete All Dnos</a>
+      <a className="btn btn-primary mx-3" onClick={() => deleteAllServices()} role="button">Delete All Services</a>
+      <a className="btn btn-primary" onClick={() => deleteAllUptimes()} role="button">Delete All Uptimes</a>
+      </div>
       <Footer />
     </>
   )
