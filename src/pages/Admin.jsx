@@ -118,9 +118,6 @@ const Admin = () => {
 
   }
 
-
-
-
   function UserData({ data }) {
 
     if (isEmpty(data)) {
