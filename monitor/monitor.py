@@ -218,7 +218,7 @@ def main():
     # dno_url = "https://preprod-sunflower.m2tec.nl/cardano-graphql"
     # preprodWallet = "addr_test1qz759fg46yvp28wrcmnxn87xq30yj6c8mh7y40zjnrg9h546h0qr3avqde9mumdaf4gykrtjz58l30g7mpy3r8nxku7q3dtrlt"
 
-    mytime = datetime.now(timezone.utc).strftime('%d:%H:%M')
+    mytime = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')
     print(mytime)
 
     parser = argparse.ArgumentParser(description="Monitor Dandelion node uptime.")
@@ -264,8 +264,6 @@ def main():
 
     console = logging.StreamHandler()
     file_handler = logging.FileHandler(log_folder + log_file_name)
-    # syslog_handler = logging.handlers.SysLogHandler(address="/dev/log")
-
 
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)s %(name)s:%(lineno)d %(message)s"
@@ -273,11 +271,9 @@ def main():
 
     console.setFormatter(formatter)
     file_handler.setFormatter(formatter)
-    # syslog_handler.setFormatter(formatter)
 
     logger.addHandler(console)
     logger.addHandler(file_handler)
-    # logger.addHandler(syslog_handler)
 
     logger.info("VITE_GRAPH_URL ".ljust(25)+ " : " + governance_url)
 
@@ -300,7 +296,6 @@ def main():
                     print("no URL")
                     pass 
                 else:
-                    print("url")
                     status = query_dno(service["url"])
 
                     if status["connection"] == 200:
@@ -319,7 +314,7 @@ def main():
                      
                     logger.info(log_name + log_subnet + log_url + log_gql)
 
-                    update_uptime_today(governance_url, uptime_id, status["query"])
+                    #update_uptime_today(governance_url, uptime_id, status["query"])
         else:
             logger.info(dno["name"].ljust(25) + " : No service URL's")
     
