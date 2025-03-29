@@ -10,7 +10,7 @@ const Footer = () => {
                 <div className="row">
 
                     <div className="col d-flex justify-content-end align-items-start px-5">
-                        <img style={{width:250}} src="/dandelion-logo.svg"></img>
+                        <img style={{width:250}} src="/assets/dandelion-logo.svg"></img>
                     </div>
 
                     <div className="col p-0">
