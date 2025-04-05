@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
-import { handleQuery, isEmpty } from '../components/Utility';
-import { json } from 'react-router-dom';
+import { handleQuery, isEmpty, handleGC } from '../components/Utility';
 
 
 const Admin = () => {
@@ -54,7 +53,7 @@ const Admin = () => {
 
   useEffect(() => {
 
-    console.log("jsondata: ", jsonData)
+    // console.log("jsondata: ", jsonData)
 
     if (jsonData) {
 
@@ -70,17 +69,43 @@ const Admin = () => {
         }
       }
 
-
       let myData = JSON.stringify(jsonData, null, 0)
-        .replaceAll('"CARDANO"', 'CARDANO')
-        .replaceAll('"GRAPHQL"', 'GRAPHQL')
-        .replaceAll('"MAINNET"', 'MAINNET')
-        .replaceAll('"PREPROD"', 'PREPROD')
 
+      let tagList = [
+      // enum Tag {
+        "GENERIC",
+        "GRAPHQL",
+        "KOIOS",
+        "OGMIOS",
+        "UNIMATRIX",
+           
+      // enum Network {
+        "CARDANO",
+        "MIDNIGHT",
+            
+      // enum Subnet {
+        "PREPROD",
+        "PREVIEW",
+        "MAINNET",
+        "SANCHONET",
+        "MIDNIGHT"
+      ]
+
+      function unquoteEnum(myData, enumFields, enumValues) {
+        for (const field of enumFields) {
+          for (const val of enumValues) {
+            const quoted = `"${field}":"${val}"`;
+            const unquoted = `"${field}":${val}`;
+            myData = myData.replace(new RegExp(quoted, 'g'), unquoted);
+          }
+        }
+        return myData;
+      }
+
+      myData = unquoteEnum(myData, ['tag', 'network', 'subnet'], tagList);     
 
       const unquoted = myData.replace(/"([^"]+)":/g, '$1:');
       console.log(unquoted)
-
 
       const fetchData = async () => {
 
@@ -98,8 +123,6 @@ const Admin = () => {
           `
         let gqlData = await handleQuery(gq)
 
-
-
       }
 
       fetchData()
@@ -109,8 +132,6 @@ const Admin = () => {
 
 
   }, [jsonData]);
-
-
 
   const DownloadJSON = ({ data }) => {
     let today = new Date().toISOString().slice(0, 10)
@@ -159,7 +180,7 @@ const Admin = () => {
 
   function UserData({ data }) {
 
-    console.log("data", data)
+    // console.log("data", data)
     if (isEmpty(data)) {
       return (<></>)
     }
@@ -172,16 +193,17 @@ const Admin = () => {
           <div className='col-3 mt-4 px-0'>
             {dno.name}
           </div>
-          
-          <div className='col-3 px-0'>
+
+          <div className='col-2 px-0'>
             <a className="btn btn-primary m-3" onClick={() => deleteUser(dno.id)} role="button">Delete user</a>
           </div>
 
+          <div className='col-3 px-0'>
+            <input id={"value-" + index} type="text" className="form-control m-3" defaultValue={index} />
+          </div>
         </div>
-
       )
     })
-
 
     return (
       <>
@@ -470,24 +492,114 @@ const Admin = () => {
 
   }
 
+  function distributeFunds(props) {
+    console.log(props)
+
+    if (props == "mainnet") {
+      let wallet = ""
+    } else {
+      let wallet = ""
+    }
+
+    let gcscript = {
+      type: "script",
+      title: "DNO funds distribution",
+      description: "Distribute compensation for running Dandelion-lite nodes",
+      exportAs: "Distribution log",
+      return: {
+        mode: "last"
+      },
+      run: {
+      }
+    }
+
+    let signTx = {
+      type: "signTxs",
+      detailedPermissions: false,
+      txs: [
+      ]
+    }
+
+
+    for (let index = 0; index < dnoData.length; index++) {
+
+      let build_tx = {
+        type: "buildTx",
+        title: "Payment",
+        description: "",
+        tx: {
+          outputs: [
+            {
+              address: "",
+              assets: [
+                {
+                  policyId: "ada",
+                  assetName: "ada",
+                  quantity: "0"
+                }
+              ]
+            }
+          ]
+        }
+      }
+
+      let value_id = "value-" + index
+      let valueElement = document.getElementById(value_id)
+      // console.log("----")
+      // console.log("D:", dnoData[index].name);
+      // console.log("W:", dnoData[index].preprodWallet);
+      console.log("E:",valueElement)
+      console.log("V:", valueElement.value)
+      
+      build_tx.description = `DNO distribution, thank you ${dnoData[index].name} for you services`
+      build_tx.tx.outputs[0].address = dnoData[index].preprodWallet
+      build_tx.tx.outputs[0].assets[0].quantity = valueElement.value
+
+      let buildTxName = "build_tx_" + index
+
+      gcscript.run[buildTxName] = build_tx
+      signTx.txs.push(`{get('cache.${buildTxName}.txHex')}`)
+
+    }
+    console.log(gcscript) 
+
+    gcscript.run["sign_tx"] = signTx
+
+    gcscript.run["submit_tx"] = {
+      type: "submitTxs",
+      txs: "{get('cache.sign_tx')}"
+    }
+
+    gcscript.run["export_results"] = {
+      type: "macro",
+      run: "{get('cache.build_tx.txHash')}"
+    }
+
+    handleGC(gcscript);
+
+
+  }
+
   return (
     <>
-    <div className='m-4'>
-      <DownloadJSON
-        data={dnoData}
-        fileName={"test"}
-      />
+      <div className='m-4'>
+        <DownloadJSON
+          data={dnoData}
+          fileName={"test"}
+        />
 
-      <InstallJSON />
-      <div className='container-fluid p-0 m-0'>
+        <InstallJSON />
+        <div id="DNO" className='container-fluid p-0 m-0'>
 
-        <UserData
-          data={dnoData} />
-      </div>
+          <UserData
+            data={dnoData} />
+        </div>
 
-      <a className="btn btn-primary" onClick={() => deleteAllDnos()} role="button">Delete All Dnos</a>
-      <a className="btn btn-primary mx-3" onClick={() => deleteAllServices()} role="button">Delete All Services</a>
-      <a className="btn btn-primary" onClick={() => deleteAllUptimes()} role="button">Delete All Uptimes</a>
+        <a className="btn btn-primary" onClick={() => deleteAllDnos()} role="button">Delete All Dnos</a>
+        <a className="btn btn-primary mx-3" onClick={() => deleteAllServices()} role="button">Delete All Services</a>
+        <a className="btn btn-primary mx-3" onClick={() => deleteAllUptimes()} role="button">Delete All Uptimes</a>
+        <a className="btn btn-primary mx-3" onClick={() => distributeFunds("preprod")} role="button">Distribute Preprod</a>
+        <a className="btn btn-primary" onClick={() => distributeFunds("mainnet")} role="button">Distribute Mainnet</a>
       </div>
       <Footer />
     </>
