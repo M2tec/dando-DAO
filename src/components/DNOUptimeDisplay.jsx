@@ -1,11 +1,38 @@
 import { useEffect, useState } from 'react'
 import { handleQuery, isEmpty } from './Utility';
 
+const now = new Date();
+
+function getMonth(negativOffset) {
+    const now = new Date();
+    const fiveMonthsAgo = new Date();
+    fiveMonthsAgo.setMonth(now.getMonth() - negativOffset);
+    
+    const month = fiveMonthsAgo.getMonth() + 1;
+    return month
+}
+
+// let thisMonth = now.getMonth() + 1
+let thisMonth = getMonth(0)
+let monthMin1 = getMonth(1)
+let monthMin2 = getMonth(2)
+console.log(thisMonth)
+console.log(monthMin1)
+console.log(monthMin2)
+
+
+const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
 const DNOUptimeDisplay = () => {
     const [dnoData, setDnoData] = useState({})
 
 
     useEffect(() => {
+
+        
 
         const fetchData = async () => {
 
@@ -19,7 +46,7 @@ const DNOUptimeDisplay = () => {
                     hardware
                     services {
                         subnet
-                        uptime(filter: {month: {in: [1, 2, 3]}}) {
+                        uptime(filter: {month: {in: [${monthMin2 }, ${monthMin1}, ${thisMonth }]}}) {
                             month
                             days
                         }
@@ -171,9 +198,6 @@ mutation { addDno(input: [
     }
     );
 
-    function daysInMonth(month, year) {
-        return new Date(year, month, 0).getDate();
-    }
 
     function DnoListData(props) {
 
@@ -193,20 +217,20 @@ mutation { addDno(input: [
         {
 
             // Reorder graphQuery, feels like a hack
-            console.log("dno", dno)
+            //  console.log("dno", dno)
             let services = dno.services
 
             let uptimeData = {}
             let uptime1 = {}
             services.map((service, index) => {
                 let subnet = service.subnet
-                console.log(subnet)
+                // console.log(subnet)
 
                 let uptimes = service.uptime
-                console.log("uptimes", uptimes)                
+                // console.log("uptimes", uptimes)                
 
                 uptimes.forEach(uptime => {
-                    console.log(uptime.month)
+                    // console.log(uptime.month)
                     
                     uptime1[uptime.month] = uptime.days 
                     uptimeData[subnet]= {...uptime1}
@@ -214,7 +238,7 @@ mutation { addDno(input: [
                 });
             })
             
-            console.log("uptimeData" , uptimeData["MAINNET"][1])
+            // console.log("uptimeData" , uptimeData["MAINNET"][1])
 
                       
             return (
@@ -228,13 +252,13 @@ mutation { addDno(input: [
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-top border border-bottom-0 border-secondary">
                            <div style={{height: "18px"}} className='d-flex align-items-end p-0 px-2'>m</div>
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"][1]}
+                                uptimeData={uptimeData["MAINNET"][thisMonth - 2 ]}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
                         <div style={{height: "18px"}} className='d-flex align-items-end px-2'>p</div>
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"][1]}
+                                uptimeData={uptimeData["PREPROD"][thisMonth - 2]}
                                  />
                         </div>
                     </div>
@@ -242,13 +266,13 @@ mutation { addDno(input: [
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
 
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"][2]}
+                                uptimeData={uptimeData["MAINNET"][thisMonth -1]}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
  
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"][2]}
+                                uptimeData={uptimeData["PREPROD"][thisMonth -1]}
                                  />
                         </div>
                     </div>
@@ -256,13 +280,13 @@ mutation { addDno(input: [
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
  
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"][3]}
+                                uptimeData={uptimeData["MAINNET"][thisMonth]}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
 
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"][3]}
+                                uptimeData={uptimeData["PREPROD"][thisMonth]}
                                  />
                         </div>
                     </div>
@@ -282,8 +306,8 @@ mutation { addDno(input: [
 
     return (
         <>
-            <div className='container-fluid p-0 m-0'>
-                {/* Heading */}
+         <div className='container-fluid p-0 m-0'>
+                Heading 
                 <div className='row m-0'>
                     <div className='col-2 m-0 p-0'>
                         <b>DNO</b>
@@ -292,20 +316,18 @@ mutation { addDno(input: [
 
                     </div>
                     <div className='col-3 m-0 px-1'>
-                        <b>Januari</b>
+                        <b>{monthNames[monthMin2 -1]}</b>
                     </div>
                     <div className='col-3 m-0 px-1'>
-                        <b>Februari</b>
+                        <b>{monthNames[monthMin1 -1]}</b>
                     </div>
                     <div className='col-3 m-0 px-1'>
-                        <b>March</b>
+                        <b>{monthNames[thisMonth -1]}</b>
                     </div>
                 </div>
 
                 <DnoListData dnoData={dnoData} />
-{/* 
-                <button type="button" onClick={handleCheckUptime} className="btn btn-primary">Update dno data</button>
-                <button type="button" onClick={handleDeleteUptime} className="btn btn-primary mx-3">Delete data</button> */}
+
             </div>
         </>
     )

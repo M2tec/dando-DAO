@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import { handleQuery, isEmpty, handleGC } from '../components/Utility';
+import AdminMenu from '../components/AdminMenu';
 
 
-const Admin = () => {
+const UserAdmin = () => {
 
   const [dnoData, setDnoData] = useState({})
   const [file, setFile] = useState(null)
@@ -582,6 +583,8 @@ const Admin = () => {
 
   return (
     <>
+      <AdminMenu />
+
       <div className='m-4'>
         <DownloadJSON
           data={dnoData}
@@ -606,4 +609,4 @@ const Admin = () => {
   )
 };
 
-export default Admin;
+export default UserAdmin;

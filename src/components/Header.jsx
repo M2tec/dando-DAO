@@ -2,11 +2,10 @@ import { isEmpty, handleGC } from "./Utility";
 import { Outlet, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Gear } from "react-bootstrap-icons";
-// import { useCookies } from "react-cookie";
+
 
 const Header = () => {
   const [walletAddress, setWalletAddress] = useState("")
-  // const [cookies, setCookie, removeCookie] = useCookies(['preprodWallet'])
 
   useEffect(() => {
     // console.log("cookies", cookies['preprodWallet'])
@@ -109,7 +108,7 @@ const Header = () => {
         return (
           <div>
             <button className="btn btn-sm border text-white mx-2" type="button">Preprod</button>
-            <div className="btn btn-sm border me-2"><Link className="text-white" to="/admin">Admin</Link></div>
+            <div className="btn btn-sm border me-2"><Link className="text-white" to="/admin-payments">Admin</Link></div>
             <button className="btn btn-sm border me-2"><Link className="nav-link text-white" to="/settings"><Gear /></Link></button>
             <button onClick={handleLogin} className="btn btn-sm border btn-secondary" type="button">{wa}</button>
 
