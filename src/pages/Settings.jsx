@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Footer from '../components/Footer';
-import NavBar from '../components/Header';
-import { graphqlQuery, isEmpty, DelayedInput, useDebounce } from '../components/Utility';
+import { graphqlQuery, useDebounce } from '../components/Utility';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Settings = () => {
   const [walletAddress, setWalletAddress] = useState("")
@@ -253,6 +253,17 @@ const Settings = () => {
     const debouncedRequest = useDebounce(() => {
       console.log("props", props)
       myQuery(walletAddress, props.field, value)
+      toast.success('Saved!', {
+        position: "top-center",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
+
       // access to latest state here
     });
 
@@ -270,6 +281,7 @@ const Settings = () => {
   return (
     <>
       <div className="m-3">
+        <ToastContainer />
         <h1 className="text-3xl font-bold mb-0"><b>Settings</b></h1>
         <p>Add you DNO info for rewards</p>
 
