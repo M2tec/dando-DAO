@@ -18,7 +18,7 @@ const UserAdmin = () => {
 
       let gq = `
               {
-              queryDno {
+              queryDno (order: { asc: name} ) {
                  id
                  name 
                  hardware
@@ -510,7 +510,7 @@ const UserAdmin = () => {
         <a className="btn btn-primary mx-3" onClick={() => deleteAllServices()} role="button">Delete All Services</a>
         <a className="btn btn-primary mx-3" onClick={() => deleteAllUptimes()} role="button">Delete All Uptimes</a>
       </div>
-      <Footer />
+
     </>
   )
 };

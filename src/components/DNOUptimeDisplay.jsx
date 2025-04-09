@@ -29,16 +29,12 @@ const monthNames = [
 const DNOUptimeDisplay = () => {
     const [dnoData, setDnoData] = useState({})
 
-
     useEffect(() => {
-
-        
-
         const fetchData = async () => {
 
             let gq = `
                 {
-                queryDno {
+                queryDno (order: { asc: name} ) {
                     id
                     name
                     mainnetWallet
@@ -56,14 +52,7 @@ const DNOUptimeDisplay = () => {
                 }       
             `
             let gqlData = await graphqlQuery(gq)
-
-
-            // console.log(gqlData)
-            // console.log("uptime", gqlData.data.queryDno[0].services[0].uptime)
-            let dData = gqlData.data.queryDno;
-
-            //console.log("dData", dData[0].services[0].uptime)
-            setDnoData(dData);
+            setDnoData(gqlData.data.queryDno);
         }
 
         fetchData()
@@ -72,7 +61,6 @@ const DNOUptimeDisplay = () => {
 
      const ProcessMonth = ( {uptimeData }) => [...uptimeData].map((item, index) => {
         
-
         if (item == 2) {
             return (
                 <div key={index} className="col p-0 m-0">
@@ -150,13 +138,13 @@ const DNOUptimeDisplay = () => {
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-top border border-bottom-0 border-secondary">
                            <div style={{height: "18px"}} className='d-flex align-items-end p-0 px-2'>m</div>
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth - 2 ] : "0"}
+                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][monthMin2] : "0"}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
                         <div style={{height: "18px"}} className='d-flex align-items-end px-2'>p</div>
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][thisMonth - 2] : "0"}
+                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][monthMin2] : "0"}
                                  />
                         </div>
                     </div>
@@ -164,13 +152,13 @@ const DNOUptimeDisplay = () => {
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
 
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth - 1 ] : "0"}
+                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][monthMin1] : "0"}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
  
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][thisMonth - 1] : "0"}
+                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][monthMin1] : "0"}
                                  />
                         </div>
                     </div>

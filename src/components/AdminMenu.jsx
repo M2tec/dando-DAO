@@ -9,7 +9,6 @@ const AdminMenu = () => {
 
   useEffect(() => {
 
-
   }, []);
 
     return (
@@ -21,8 +20,8 @@ const AdminMenu = () => {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ml-auto">
-                <li className="px-1 nav-item"><Link className="nav-link text-black"  to="/admin-users">Users</Link></li>
-                <li className="px-1 nav-item"><Link className="nav-link text-black" to="/admin-payments">Payments</Link></li>
+                <li className="px-1 nav-item btn btn-secondary"><Link className="nav-link text-white"  to="/admin-users">Users</Link></li>
+                <li className="px-1 nav-item btn btn-secondary mx-1"><Link className="nav-link text-white" to="/admin-payments">Payments</Link></li>
               </ul>
 
             </div>

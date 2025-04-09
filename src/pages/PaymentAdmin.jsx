@@ -8,14 +8,13 @@ const PaymentAdmin = () => {
 
   const [dnoData, setDnoData] = useState({})
 
-
   useEffect(() => {
 
     const fetchData = async () => {
 
       let gq = `
               {
-              queryDno {
+              queryDno (order: { asc: name} ) {
                  id
                  name 
                  hardware
@@ -58,16 +57,14 @@ const PaymentAdmin = () => {
 
     const Dnos = data.map((dno, index) => // { console.log("dno", dno.uptimes.uptimeData[0])}
     {
-
       return (
-        
-          <div key={index} className='row m-0 mb-2'>
-            <div className='col-3 mt-1 px-0'>
-              <b>{dno.name}</b>
-            </div>
-          
-          <div className='row m-0 mb-2'>
 
+        <div key={index} className='row m-0 mb-2'>
+          <div className='col-3 mt-1 px-0'>
+            <b>{dno.name}</b>
+          </div>
+
+          <div className='row m-0 mb-2'>
             <div className='col-1 px-0 pt-1'>
               Preprod
             </div>
@@ -85,12 +82,11 @@ const PaymentAdmin = () => {
             </div>
 
             <div className='col-2'>
-              <a className="btn btn-primary btn-block w-100" onClick={() => distributeToUser({ dno: dno, network: "preprod", userIndex: index  })} role="button">Distribute</a>
+              <a className="btn btn-primary btn-block w-100" onClick={() => distributeToUser({ dno: dno, network: "preprod", userIndex: index })} role="button">Distribute</a>
             </div>
-
           </div>
-          <div className='row m-0 mb-2'>
 
+          <div className='row m-0 mb-2'>
             <div className='col-1 px-0 pt-1'>
               Mainnet
             </div>
@@ -108,10 +104,10 @@ const PaymentAdmin = () => {
             </div>
 
             <div className='col-2'>
-              <a className="btn btn-primary btn-block w-100" onClick={() => distributeToUser({ dno: dno, network: "mainnet", userIndex: index  })} role="button">Distribute</a>
+              <a className="btn btn-primary btn-block w-100" onClick={() => distributeToUser({ dno: dno, network: "mainnet", userIndex: index })} role="button">Distribute</a>
             </div>
           </div>
-          </div>
+        </div>
       )
     })
 
@@ -312,7 +308,6 @@ const PaymentAdmin = () => {
           <a className="btn btn-primary" onClick={() => distributeFunds("mainnet")} role="button">Distribute Mainnet</a>
         </div>
       </div>
-      <Footer />
     </>
   )
 };
