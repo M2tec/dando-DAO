@@ -4,34 +4,37 @@ import { useRef, useEffect, useMemo } from 'react';
 
 let graphUrl = import.meta.env.VITE_GRAPH_URL
 
-export async function handleGC(gcscript) {
+export async function handleGC(gcscript, network) {
 
     console.log(JSON.stringify(gcscript))
 
     let url = await gc.encode.url({
         input: JSON.stringify(gcscript), // GCScript is pure JSON code, supported on all platforms
         apiVersion: '2', //APIV2
-        network: 'preprod', // mainnet or preprod
+        network: network, // mainnet or preprod
         encoding: 'gzip' //suggested, default message encoding/compression 
     });
 
+    if (network == "mainnet") {
+
+    }
     // url = url.replace("https://beta-preprod-wallet.", "https://dev-preprod-wallet.")
 
-    window.open(url, '_blank', 'location=yes,height=700,width=520,scrollbars=yes,status=yes');
+    window.open(url, '_blank', 'location=yes,height=1200,width=900,scrollbars=yes,status=yes');
 }
 
 export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-export async function handleQuery(gq) {
+export async function graphqlQuery(gq, variables={}) {
     console.log("API URL: ", graphUrl)
     console.log(gq)
+    console.log(variables)
 
-    let gquery = { query: gq.replace(/\n/g, ' ') };
-
-    let gqlBody = JSON.stringify(gquery)
-
+    // let gquery = { query: gq.replace(/\n/g, ' '), variables: variables };
+    let gquery = { query: gq, variables: variables };
+    console.log("gquery: ", gquery)
     try {
         const response = await fetch(graphUrl,
             {
@@ -39,7 +42,7 @@ export async function handleQuery(gq) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: gqlBody
+                body: JSON.stringify(gquery)
             }
         );
         if (!response.ok) {
@@ -111,7 +114,7 @@ function myQuery(address, field, value) {
 
     const fetchData = async () => {
 
-        let gqlData = await handleQuery(gq)
+        let gqlData = await graphqlQuery(gq)
 
         console.log(gqlData)
     }

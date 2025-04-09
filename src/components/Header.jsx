@@ -79,7 +79,7 @@ const Header = () => {
       "returnURLPattern": host + "/return-data?d={result}"
     }
 
-    handleGC(gcscript);
+    handleGC(gcscript, "preprod");
 
 
   }

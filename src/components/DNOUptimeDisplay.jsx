@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { handleQuery, isEmpty } from './Utility';
+import { graphqlQuery, isEmpty } from './Utility';
 
 const now = new Date();
 
@@ -55,7 +55,8 @@ const DNOUptimeDisplay = () => {
                 }
                 }       
             `
-            let gqlData = await handleQuery(gq)
+            let gqlData = await graphqlQuery(gq)
+
 
             // console.log(gqlData)
             // console.log("uptime", gqlData.data.queryDno[0].services[0].uptime)
@@ -68,109 +69,6 @@ const DNOUptimeDisplay = () => {
         fetchData()
             .catch(console.error);
     }, []);
-
-
-    function handleCheckUptime() {
-        const fetchData = async () => {
-
-            let gq = `
-            query {
-            queryDno {
-                id
-                name
-                mainnetWallet
-                preprodWallet
-                hardware
-                services(filter: { subnet: {eq: PREPROD}}){
-                uptime(filter: { month: {in: [1,2,3]}}){
-                    month
-                    days
-                }
-                }
-            }
-            }  
-            `
-            let gqlData = await handleQuery(gq)
-
-            // console.log(gqlData)
-            let dData = gqlData.data.queryDno;
-            // console.log(dData)
-            setDnoData(dData);
-        }
-
-        fetchData()
-            .catch(console.error);
-
-    }
-
-    function handleDeleteUptime() {
-        const fetchData = async () => {
-
-            let gq = `
-
-            mutation { deleteUptime (filter: { network: {eq: CARDANO}})
-            {
-              msg
-              uptime {
-                month
-                days
-              }
-          }
-          }         
-            `
-            let gqlData = await handleQuery(gq)
-
-            // console.log(gqlData)
-            let dData = gqlData.data.queryDno;
-            // console.log(dData)
-            setDnoData(dData);
-        }
-
-        fetchData()
-            .catch(console.error);
-
-    }
-
-    async function handleUpdateData(e) {
-      // console.log("Update")
-
-        let gq = `
-
-mutation { addDno(input: [
-    { 
-        name: "Adriano Fiorenza", 
-        mainnetWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
-        preprodWallet: "addr_test1qpfq52v9k60rmytrpdy3zwvtda78ah3kjng6luj273zrkaadqwj2u3djrag0mene2cm9elu5mdqmcz9zc2rzgq7c5g6q0rl88m",
-    },
-    { 
-        name: "Roberto Moreno", 
-        mainnetWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6",
-        preprodWallet: "addr_test1qqveyzyq7rgv69lfd36g34r2cqv5w52gflss8qmd9445q84jeydv636p62uy7lf9lheagf2q9u0aadw09g2t8vu2wnjqd9xsl6"
-    }
-    ], upsert: true )
-    {
-        dno {
-            id
-            name
-        }
-    }
-}
-
-`
-
-        // let gqlQuery = { query: gq.replace(/\n/g, ' ') };
-        // const gqlQuery = { query: "query { queryDno { firstName lastName address nodeUrl uptimes { uptimeData }}}"}
-
-        const fetchData = async () => {
-
-            let gqlData = await handleQuery(gq)
-          // console.log(gqlData)
-
-        }
-
-        fetchData()
-            .catch(console.error);
-    }
 
      const ProcessMonth = ( {uptimeData }) => [...uptimeData].map((item, index) => {
         
@@ -252,13 +150,13 @@ mutation { addDno(input: [
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-top border border-bottom-0 border-secondary">
                            <div style={{height: "18px"}} className='d-flex align-items-end p-0 px-2'>m</div>
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"][thisMonth - 2 ]}
+                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth - 2 ] : "0"}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
                         <div style={{height: "18px"}} className='d-flex align-items-end px-2'>p</div>
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"][thisMonth - 2]}
+                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][thisMonth - 2] : "0"}
                                  />
                         </div>
                     </div>
@@ -266,13 +164,13 @@ mutation { addDno(input: [
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
 
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"][thisMonth -1]}
+                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth - 1 ] : "0"}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
  
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"][thisMonth -1]}
+                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][thisMonth - 1] : "0"}
                                  />
                         </div>
                     </div>
@@ -280,13 +178,13 @@ mutation { addDno(input: [
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
  
                            <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"][thisMonth]}
+                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth] : "0"}
                                  />
                         </div>
                         <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
 
                            <ProcessMonth
-                                uptimeData={uptimeData["PREPROD"][thisMonth]}
+                                uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][thisMonth] : "0"}
                                  />
                         </div>
                     </div>
@@ -307,7 +205,6 @@ mutation { addDno(input: [
     return (
         <>
          <div className='container-fluid p-0 m-0'>
-                Heading 
                 <div className='row m-0'>
                     <div className='col-2 m-0 p-0'>
                         <b>DNO</b>

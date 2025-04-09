@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Footer from '../components/Footer';
 import NavBar from '../components/Header';
-import { handleQuery, isEmpty, DelayedInput, useDebounce } from '../components/Utility';
+import { graphqlQuery, isEmpty, DelayedInput, useDebounce } from '../components/Utility';
 
 const Settings = () => {
   const [walletAddress, setWalletAddress] = useState("")
@@ -43,7 +43,7 @@ const Settings = () => {
       }
     }`
 
-      let gqlData = await handleQuery(gq)
+      let gqlData = await graphqlQuery(gq)
 
       // Setup database fields when the address is not yet in the database
       if (gqlData.data.getDno === null) {
@@ -107,7 +107,7 @@ const Settings = () => {
 
         console.log(gq)
         const fetchData = async () => {
-          await handleQuery(gq)
+          await graphqlQuery(gq)
         }
 
         fetchData()
@@ -173,7 +173,7 @@ const Settings = () => {
       async function f() {
 
         try {
-          let response = await handleQuery(gq)
+          let response = await graphqlQuery(gq)
           let serviceId = response.data.queryService[0].id
           console.log(serviceId)
 
@@ -198,7 +198,7 @@ const Settings = () => {
           `
 
 
-          response = await handleQuery(gq)
+          response = await graphqlQuery(gq)
           console.log(response)
 
 
@@ -230,7 +230,7 @@ const Settings = () => {
       async function f() {
 
         try {
-          let response = await handleQuery(gq)
+          let response = await graphqlQuery(gq)
           console.log(response)
 
         } catch (err) {

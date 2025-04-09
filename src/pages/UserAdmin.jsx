@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
-import { handleQuery, isEmpty, handleGC } from '../components/Utility';
+import { graphqlQuery, isEmpty, handleGC } from '../components/Utility';
 import AdminMenu from '../components/AdminMenu';
 
 
@@ -40,7 +40,7 @@ const UserAdmin = () => {
               }
               }       
           `
-      let gqlData = await handleQuery(gq)
+      let gqlData = await graphqlQuery(gq)
 
       let dData = gqlData.data.queryDno;
 
@@ -73,18 +73,18 @@ const UserAdmin = () => {
       let myData = JSON.stringify(jsonData, null, 0)
 
       let tagList = [
-      // enum Tag {
+        // enum Tag {
         "GENERIC",
         "GRAPHQL",
         "KOIOS",
         "OGMIOS",
         "UNIMATRIX",
-           
-      // enum Network {
+
+        // enum Network {
         "CARDANO",
         "MIDNIGHT",
-            
-      // enum Subnet {
+
+        // enum Subnet {
         "PREPROD",
         "PREVIEW",
         "MAINNET",
@@ -103,7 +103,7 @@ const UserAdmin = () => {
         return myData;
       }
 
-      myData = unquoteEnum(myData, ['tag', 'network', 'subnet'], tagList);     
+      myData = unquoteEnum(myData, ['tag', 'network', 'subnet'], tagList);
 
       const unquoted = myData.replace(/"([^"]+)":/g, '$1:');
       console.log(unquoted)
@@ -122,7 +122,7 @@ const UserAdmin = () => {
             }
           }     
           `
-        let gqlData = await handleQuery(gq)
+        let gqlData = await graphqlQuery(gq)
 
       }
 
@@ -237,7 +237,7 @@ const UserAdmin = () => {
               }
               }       
           `
-      let gqlData = await handleQuery(gq)
+      let gqlData = await graphqlQuery(gq)
       console.log(gqlData)
 
       let dno = gqlData.data.queryDno[0]
@@ -287,7 +287,7 @@ const UserAdmin = () => {
         }
       }`
         console.log(gq)
-        let gqlData = await handleQuery(gq)
+        let gqlData = await graphqlQuery(gq)
 
       }
 
@@ -308,7 +308,7 @@ const UserAdmin = () => {
           }
         }`
         console.log(gq)
-        let gqlData = await handleQuery(gq)
+        let gqlData = await graphqlQuery(gq)
 
       }
       deleteService()
@@ -329,7 +329,7 @@ const UserAdmin = () => {
             }
           }`
         console.log(gq)
-        let gqlData = await handleQuery(gq)
+        let gqlData = await graphqlQuery(gq)
 
       }
       deleteDno()
@@ -348,8 +348,8 @@ const UserAdmin = () => {
                 }
               }       
           `
-      let gqlData = await handleQuery(gq)
-      console.log(gqlData)
+      let gqlData = await graphqlQuery(gq)
+      // console.log(gqlData)
       return (gqlData)
     }
 
@@ -357,25 +357,44 @@ const UserAdmin = () => {
       .catch(console.error);
 
     fetchData().then((gqlData) => {
-      console.log(gqlData)
+      // console.log(gqlData.data.queryDno)
 
+      let dnoList = []
+      for (let dno of gqlData.data.queryDno) {
+        dnoList.push(dno["id"])
+      }
+
+      const deleteDnos = async () => {
+        let gq = `mutation deleteDno ($filter: DnoFilter!) {
+                    deleteDno(filter: $filter) {
+                      msg
+                      dno {
+                        id
+                        name
+                      }
+                    }
+                  }`
+        gqlData = await graphqlQuery(gq, { filter: { id: dnoList } })
+      }
+
+      deleteDnos()
+        .catch(console.error);
     })
 
 
   }
 
   function deleteAllServices(props) {
-    console.log("dS")
+    console.log("delete Services")
     const fetchData = async () => {
 
-      let gq = `
-              {
+      let gq = `{
               queryService {
                  id
                 }
-              }       
-          `
-      let gqlData = await handleQuery(gq)
+              }`
+
+      let gqlData = await graphqlQuery(gq)
       console.log(gqlData)
       return (gqlData)
     }
@@ -387,39 +406,28 @@ const UserAdmin = () => {
     fetchData()
       .then((gqlData) => {
 
-        let services = gqlData.data.queryService
-        console.log("services: ", services)
-
         const deleteUptime = async () => {
+          let serviceList = []
 
-
-
-          // console.log("data", dno)
-          // Create ID list
-
-          let idList = { services: [] }
-
-          for (let [key, uptime] of Object.entries(services)) {
-            idList["services"].push(uptime.id)
-
+          for (let service of gqlData.data.queryService) {
+            serviceList.push(service["id"])
           }
 
-          console.log("idList: ", idList)
+          console.log("serviceList: ", serviceList)
 
-          var servicesString = idList["services"].length === 0 ? "" : '"' + idList["services"].join('","') + '"';
-
-          console.log(servicesString)
-          let gq = `mutation { 
-        deleteService (filter: { id:[${servicesString}]})
-        {
+          let gq = `mutation deleteService ($filter: ServiceFilter!) {
+          deleteService(filter: $filter) {
             msg
             service {
-                subnet
+              id
+              tag
+              network
             }
           }
         }`
+
           console.log(gq)
-          gqlData = await handleQuery(gq)
+          gqlData = await graphqlQuery(gq, { filter: { id: serviceList } })
 
         }
 
@@ -432,14 +440,12 @@ const UserAdmin = () => {
   function deleteAllUptimes(props) {
     const fetchData = async () => {
 
-      let gq = `
-              {
+      let gq = `{
               queryUptime {
                  id
                 }
-              }       
-          `
-      let gqlData = await handleQuery(gq)
+              }`
+      let gqlData = await graphqlQuery(gq)
       // console.log(gqlData)
       return (gqlData)
     }
@@ -454,130 +460,32 @@ const UserAdmin = () => {
         console.log("Uptimes: ", uptimes)
 
         const deleteUptime = async () => {
-
-
-
-          // console.log("data", dno)
-          // Create ID list
-
-          let idList = { uptimes: [] }
-
-          for (let [key, uptime] of Object.entries(uptimes)) {
-            idList["uptimes"].push(uptime.id)
-
+          
+          let uptimeList = []
+          for (let uptime of gqlData.data.queryUptime) {
+            uptimeList.push(uptime["id"])
           }
-
-          console.log("idList: ", idList)
-
-          var uptimeString = idList["uptimes"].length === 0 ? "" : '"' + idList["uptimes"].join('","') + '"';
-
-          console.log(uptimeString)
-          let gq = `mutation { 
-        deleteUptime (filter: { id:[${uptimeString}]})
-        {
-            msg
-            uptime {
-                month
-                days
-            }
-          }
-        }`
+      
+          let gq = `mutation deleteUptime ($filter: UptimeFilter!) {
+                    deleteUptime(filter: $filter) {
+                      msg
+                      uptime {
+                        id
+                        month
+                        service {
+                          network
+                        }
+                      }
+                    }
+                  }`
           console.log(gq)
-          gqlData = await handleQuery(gq)
+          gqlData = await graphqlQuery(gq, { filter: { id: uptimeList } })
 
         }
 
         deleteUptime()
           .catch(console.error);
       })
-
-  }
-
-  function distributeFunds(props) {
-    console.log(props)
-
-    if (props == "mainnet") {
-      let wallet = ""
-    } else {
-      let wallet = ""
-    }
-
-    let gcscript = {
-      type: "script",
-      title: "DNO funds distribution",
-      description: "Distribute compensation for running Dandelion-lite nodes",
-      exportAs: "Distribution log",
-      return: {
-        mode: "last"
-      },
-      run: {
-      }
-    }
-
-    let signTx = {
-      type: "signTxs",
-      detailedPermissions: false,
-      txs: [
-      ]
-    }
-
-
-    for (let index = 0; index < dnoData.length; index++) {
-
-      let build_tx = {
-        type: "buildTx",
-        title: "Payment",
-        description: "",
-        tx: {
-          outputs: [
-            {
-              address: "",
-              assets: [
-                {
-                  policyId: "ada",
-                  assetName: "ada",
-                  quantity: "0"
-                }
-              ]
-            }
-          ]
-        }
-      }
-
-      let value_id = "value-" + index
-      let valueElement = document.getElementById(value_id)
-      // console.log("----")
-      // console.log("D:", dnoData[index].name);
-      // console.log("W:", dnoData[index].preprodWallet);
-      console.log("E:",valueElement)
-      console.log("V:", valueElement.value)
-      
-      build_tx.description = `DNO distribution, thank you ${dnoData[index].name} for you services`
-      build_tx.tx.outputs[0].address = dnoData[index].preprodWallet
-      build_tx.tx.outputs[0].assets[0].quantity = valueElement.value
-
-      let buildTxName = "build_tx_" + index
-
-      gcscript.run[buildTxName] = build_tx
-      signTx.txs.push(`{get('cache.${buildTxName}.txHex')}`)
-
-    }
-    console.log(gcscript) 
-
-    gcscript.run["sign_tx"] = signTx
-
-    gcscript.run["submit_tx"] = {
-      type: "submitTxs",
-      txs: "{get('cache.sign_tx')}"
-    }
-
-    gcscript.run["export_results"] = {
-      type: "macro",
-      run: "{get('cache.build_tx.txHash')}"
-    }
-
-    handleGC(gcscript);
-
 
   }
 
@@ -601,8 +509,6 @@ const UserAdmin = () => {
         <a className="btn btn-primary" onClick={() => deleteAllDnos()} role="button">Delete All Dnos</a>
         <a className="btn btn-primary mx-3" onClick={() => deleteAllServices()} role="button">Delete All Services</a>
         <a className="btn btn-primary mx-3" onClick={() => deleteAllUptimes()} role="button">Delete All Uptimes</a>
-        <a className="btn btn-primary mx-3" onClick={() => distributeFunds("preprod")} role="button">Distribute Preprod</a>
-        <a className="btn btn-primary" onClick={() => distributeFunds("mainnet")} role="button">Distribute Mainnet</a>
       </div>
       <Footer />
     </>
