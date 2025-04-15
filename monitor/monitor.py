@@ -33,7 +33,7 @@ def graphql_query(database_url, query, variables="{}"):
     return_data = ""
     return_code = ""
     try:
-        r = requests.post(database_url, json=myjson)
+        r = requests.post(database_url, json=myjson, timeout=2)
         logger.debug("Status: " + repr(r.status_code))
         logger.debug("graphql_query: " + r.text)
         return_code = r.status_code
@@ -49,9 +49,14 @@ def graphql_query(database_url, query, variables="{}"):
     except json.decoder.JSONDecodeError as e:
         #logger.info("graphql_query: JSON decode error " + str(e))
         pass
-        # print(e)
-    
+    except requests.exceptions.MissingSchema as e:
+        logger.info("MissingSchema error: " + str(e))
+    except requests.exceptions.ReadTimeout as e:
+        logger.info("Timedout, service not available: " + str(e))
+        return_code = "Timeout"
+
     return_value = {"return_code": return_code, "return_data": return_data }
+    # print("Returncode: " + str(return_code))
     return return_value
 
 def query_dno(dno_url):
@@ -83,8 +88,13 @@ def query_dno(dno_url):
 
     # print("===================\n\n")
     if type(r_data) == dict:
-        if "slotNo" in r_data["data"]["cardano"]["tip"]:
-            is_OK = 2
+        # print(r_data)
+        try: 
+            if "slotNo" in r_data["data"]["cardano"]["tip"]:
+                is_OK = 2
+        except TypeError:
+                print("Type Error, Graphql not returning tip information")
+                is_OK = 0 
 
     # koios   
     # logger.info(dno_url + "\t\t" + str(is_OK))
@@ -225,7 +235,6 @@ def main():
     parser.add_argument("env",  nargs='?', default=".env.development", help="Provide the environment file (e.g., .env.development)")
     args = parser.parse_args()
 
-
     environment_file = args.env
 
     log_file_name = "monitor.dev.log"
@@ -259,7 +268,7 @@ def main():
 
 
     envir = os.environ
-    print(envir)
+    # print(envir)
     print(log_folder)
 
     console = logging.StreamHandler()
@@ -286,37 +295,38 @@ def main():
     # print("\n\n")
     
     for dno in dno_data:
-        # print(dno["name"])
-        if dno["services"][0]["url"] != None and dno["services"][1]["url"] :
-            for service in dno["services"]:
+        print("")
+        print(dno["name"])
+        # print(dno["services"])
+
+        for service in dno["services"]:
+            # print(service["url"])
+            if service["url"] != None and service["url"] and  service["url"].startswith("https://"):
+
                 uptime_id = service["uptime"][0]["id"]
-                # print(uptime_id)
+
+                status = query_dno(service["url"])
                 
-                if service["url"] == "":
-                    print("no URL")
-                    pass 
+                logger_result = "Fail"
+                if status["connection"] == 200:
+                    if status["query"] == 1:
+                        logger_result = "Fail"
+                    if status["query"] == 2:
+                        logger_result = "Pass"
                 else:
-                    status = query_dno(service["url"])
+                    logger_result = str(status["connection"])
+                    
+                log_name = dno["name"].ljust(25) + " : "
+                log_subnet = str(service["subnet"]).ljust(10) + " : " 
+                log_url = str(service["url"]).ljust(45) 
+                log_gql = "gql: " + logger_result
+                
+                logger.info(log_name + log_subnet + log_url + log_gql)
 
-                    if status["connection"] == 200:
-                        if status["query"] == 1:
-                            logger_result = "Fail"
-                        if status["query"] == 2:
-                            logger_result = "Pass"
-                    else:
-                        logger_result = str(status["connection"])
-
-                        
-                    log_name = dno["name"].ljust(25) + " : "
-                    log_subnet = str(service["subnet"]).ljust(10) + " : " 
-                    log_url = str(service["url"]).ljust(45) 
-                    log_gql = "gql: " + logger_result
-                     
-                    logger.info(log_name + log_subnet + log_url + log_gql)
-
-                    update_uptime_today(governance_url, uptime_id, status["query"])
-        else:
-            logger.info(dno["name"].ljust(25) + " : No service URL's")
+                # print("Status: " + str(status["query"]))
+                update_uptime_today(governance_url, uptime_id, status["query"])
+            else:
+                logger.info(dno["name"].ljust(25) + " : No service URL's")
     
 if __name__ == "__main__":
     main()
