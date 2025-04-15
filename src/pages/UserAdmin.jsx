@@ -199,9 +199,6 @@ const UserAdmin = () => {
             <a className="btn btn-primary m-3" onClick={() => deleteUser(dno.id)} role="button">Delete user</a>
           </div>
 
-          <div className='col-3 px-0'>
-            <input id={"value-" + index} type="text" className="form-control m-3" defaultValue={index} />
-          </div>
         </div>
       )
     })

@@ -121,10 +121,10 @@ const PaymentAdmin = () => {
 
   }
 
-  function distributeFunds(data) {
-    console.log(data)
+  function distributeFunds(network) {
+    console.log("data: " , network)
 
-    if (data.network == "mainnet") {
+    if (network == "mainnet") {
       let wallet = ""
     } else {
       let wallet = ""
@@ -172,7 +172,8 @@ const PaymentAdmin = () => {
         }
       }
 
-      let value_id = "value-" + data.network + "-" + index
+      let value_id = "value-" + network + "-" + index
+      console.log("value_id" , value_id)
       let valueElement = document.getElementById(value_id)
       // console.log("----")
       // console.log("D:", dnoData[index].name);
