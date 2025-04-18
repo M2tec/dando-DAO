@@ -301,7 +301,7 @@ def main():
 
         for service in dno["services"]:
             # print(service["url"])
-            if service["url"] != None and service["url"] and  service["url"].startswith("https://"):
+            if service["url"] != None and service["url"] and  service["url"].startswith("http"):
 
                 uptime_id = service["uptime"][0]["id"]
 
