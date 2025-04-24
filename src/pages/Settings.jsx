@@ -61,7 +61,7 @@ const Settings = () => {
               services: [
                 { network: CARDANO, 
                   subnet: PREPROD, 
-                  tag: GENERIC, 
+                  tag: GRAPHQL, 
                   url: "", 
                   uptime: [
                     {month: 1, days: "0"}, 
@@ -78,7 +78,7 @@ const Settings = () => {
                     {month: 12, days: "0"}]}, 
                { network: CARDANO, 
                   subnet: MAINNET, 
-                  tag: GENERIC, 
+                  tag: GRAPHQL, 
                   url: "", 
                   uptime: [
                     {month: 1, days: "0"}, 
@@ -159,12 +159,13 @@ const Settings = () => {
 
       gq = `
       { 
-          queryService(filter: {subnet: {eq: ` + field + ` }})
+          queryDno(filter: {preprodWallet: {eq: "` + address + `" }})
               {
-              id
-              url
-              dno(filter: {preprodWallet: {eq: "addr_test1qqwfs0k42vve88mw2gdl08zevk3tg44vm2up66k555sd8uau4p4s4tm6s7fr7dp6hmqxe3klu484pehqg3t50ed27jfqz046we" }}){
-                preprodWallet
+              name 
+              preprodWallet
+              services(filter: {subnet: {eq: ` + field + ` }}){
+                id
+                url
               }
           }
       } 
@@ -174,7 +175,8 @@ const Settings = () => {
 
         try {
           let response = await graphqlQuery(gq)
-          let serviceId = response.data.queryService[0].id
+          console.log("Response: ", response)
+          let serviceId = response.data.queryDno[0].services[0].id
           console.log(serviceId)
 
           gq = `
