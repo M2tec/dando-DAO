@@ -67,6 +67,47 @@ export async function graphqlQuery(gq, variables={}) {
     }
 }
 
+
+export async function cardanoGqlQuery(gq, variables={}) {
+    let mainnetGqlUrl = "https://mainnet-sunflower.m2tec.nl/cardano-graphql"
+    console.log("API URL: ", mainnetGqlUrl)
+    console.log(gq)
+    console.log(variables)
+
+    // let gquery = { query: gq.replace(/\n/g, ' '), variables: variables };
+    let gquery = { query: gq, variables: variables };
+    console.log("gquery: ", gquery)
+    try {
+        const response = await fetch(mainnetGqlUrl,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(gquery)
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const gqlData = await response.json();
+        // console.log(gqlData)
+        if (typeof gqlData["errors"] !== 'undefined' || gqlData["errors"] === null) {
+            console.log("GQL query error: \n" + gqlData["errors"][0]['message'])
+
+        } else {
+            console.log(gqlData)
+        }
+
+
+        // console.log(json);
+        return gqlData
+
+    } catch (error) {
+        console.error(error.message);
+    }
+}
 // Array or object agnostic value getter for nested structures
 // Paths can be "unsafe" paths from flatten
 // Does throw on errors, not returning null values

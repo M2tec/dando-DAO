@@ -195,6 +195,11 @@ const UserAdmin = () => {
             {dno.name}
           </div>
 
+          <div className='col-5 mt-4 px-0'>
+            {dno.services[0].url} <br />
+            {dno.services[1].url}
+          </div>
+
           <div className='col-2 px-0'>
             <a className="btn btn-primary m-3" onClick={() => deleteUser(dno.id)} role="button">Delete user</a>
           </div>
