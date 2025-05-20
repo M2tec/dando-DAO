@@ -30,84 +30,79 @@ const Settings = () => {
 
     const fetchData = async () => {
 
-      let gq = `query {
-      getDno(preprodWallet: "` + walletAddress + `") {
-        name
-        preprodWallet
-        mainnetWallet
-        hardware
-        services {
-          subnet
-          url
+      let gq = `query GetDno($preprodWallet: String!) {
+        getDno(preprodWallet: $preprodWallet) {
+          name
+          preprodWallet
+          mainnetWallet
+          hardware
+          services {
+            subnet
+            url
+          }
         }
-      }
-    }`
+      }`
 
-      let gqlData = await graphqlQuery(gq)
+      let gqlData = await graphqlQuery(gq,
+        {
+          "preprodWallet": walletAddress
+        })
 
       // Setup database fields when the address is not yet in the database
       if (gqlData.data.getDno === null) {
         console.log("No database object yet")
 
         gq = `
-
-        mutation {
-          addDno(
-            input: [{
-              name: "", 
-              mainnetWallet: "", 
-              preprodWallet: "` + walletAddress + `", 
-              hardware: "", 
-              services: [
-                { network: CARDANO, 
-                  subnet: PREPROD, 
-                  tag: GRAPHQL, 
-                  url: "", 
-                  uptime: [
-                    {month: 1, days: "0"}, 
-                    {month: 2, days: "0"}, 
-                    {month: 3, days: "0"}, 
-                    {month: 4, days: "0"}, 
-                    {month: 5, days: "0"}, 
-                    {month: 6, days: "0"}, 
-                    {month: 7, days: "0"}, 
-                    {month: 8, days: "0"},
-                    {month: 9, days: "0"},
-                    {month: 10, days: "0"},
-                    {month: 11, days: "0"},
-                    {month: 12, days: "0"}]}, 
-               { network: CARDANO, 
-                  subnet: MAINNET, 
-                  tag: GRAPHQL, 
-                  url: "", 
-                  uptime: [
-                    {month: 1, days: "0"}, 
-                    {month: 2, days: "0"}, 
-                    {month: 3, days: "0"}, 
-                    {month: 4, days: "0"}, 
-                    {month: 5, days: "0"}, 
-                    {month: 6, days: "0"}, 
-                    {month: 7, days: "0"}, 
-                    {month: 8, days: "0"},
-                    {month: 9, days: "0"},
-                    {month: 10, days: "0"},
-                    {month: 11, days: "0"},
-                    {month: 12, days: "0"}]}
-              ]}],
-            upsert: true
-          ) {
-            dno {
-              id
-              name
-              preprodWallet
+          mutation AddDno($walletAddress: String!) {
+            addDno(
+              input: [{
+                name: "", 
+                mainnetWallet: "", 
+                preprodWallet: $walletAddress, 
+                hardware: "", 
+                services: [
+                  { 
+                    network: CARDANO, 
+                    subnet: PREPROD, 
+                    tag: GENERIC, 
+                    url: "", 
+                    uptime: [
+                      {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
+                      {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
+                      {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
+                    ]
+                  },
+                  { 
+                    network: CARDANO, 
+                    subnet: MAINNET, 
+                    tag: GENERIC, 
+                    url: "", 
+                    uptime: [
+                      {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
+                      {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
+                      {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
+                    ]
+                  }
+                ]
+              }],
+              upsert: true
+            ) {
+              dno {
+                id
+                name
+                preprodWallet
+              }
             }
           }
-        }
+
       `
 
         console.log(gq)
         const fetchData = async () => {
-          await graphqlQuery(gq)
+          await graphqlQuery(gq,
+            {
+              "preprodWallet": walletAddress
+            })
         }
 
         fetchData()
@@ -155,6 +150,7 @@ const Settings = () => {
 
     let gq = ""
 
+    console.log("Address: ", address)
     if (field == "PREPROD" || field == "MAINNET") {
 
       gq = `
@@ -170,37 +166,41 @@ const Settings = () => {
           }
       } 
       `
+   
 
       async function f() {
 
         try {
           let response = await graphqlQuery(gq)
-          console.log("Response: ", response)
+
+          console.log("response: ", response)
           let serviceId = response.data.queryDno[0].services[0].id
-          console.log(serviceId)
+
+          console.log("serviceId: ", serviceId)
 
           gq = `
-          mutation { 
-            updateService(
-              input: {
-                filter: { 
-                  id: ["` + serviceId + `"]}, 
-                  set: {url: "` + value + `"}
+            mutation UpdateService($serviceId: ID!, $value: String!) {
+              updateService(
+                input: {
+                  filter: { id: [$serviceId] }, 
+                  set: { url: $value }
                 }
-            ) 
-            {
-              service {
-                subnet
-                network
-                id
-                tag
+              ) {
+                service {
+                  subnet
+                  network
+                  id
+                  tag
+                }
               }
             }
-          }
           `
-
-
-          response = await graphqlQuery(gq)
+          response = await graphqlQuery(gq,
+            {
+              "serviceId": serviceId,
+              "value": value
+            }
+          )
           console.log(response)
 
 
@@ -264,7 +264,7 @@ const Settings = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        });
+      });
 
       // access to latest state here
     });
@@ -357,7 +357,6 @@ const Settings = () => {
                 />
 
               </div>
-
 
               <div className="form-group mb-2">
                 <label htmlFor="dno\FormControlInput1">Node Url mainnet</label>
