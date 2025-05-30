@@ -59,48 +59,6 @@ def graphql_query(database_url, query, variables="{}"):
     # print("Returncode: " + str(return_code))
     return return_value
 
-def query_dno_old(dno_url):
-
-    is_OK = 1 # 0 is no data, 1 is query failed and 2 is query succeeded
-
-    # GraphQL
-    dno_url = dno_url.removesuffix('/') + "/cardano-graphql" 
-    
-    query = """query { cardano
-    { tip 
-        { number slotNo epoch
-            { number }
-        }
-    }  
-}
-    """
-
-    r = graphql_query(dno_url, query)
-
-    if r["return_code"] != 200:
-        pass
-        # logger.info(r["return_code"])
-
-    r_data = r["return_data"]
-
-    # print("\n\n===================")
-    # print("r_data:  " + str(r_data))
-
-    # print("===================\n\n")
-    if type(r_data) == dict:
-        # print(r_data)
-        try: 
-            if "slotNo" in r_data["data"]["cardano"]["tip"]:
-                is_OK = 2
-        except TypeError:
-                print("Type Error, Graphql not returning tip information")
-                is_OK = 0 
-
-    # koios   
-    # logger.info(dno_url + "\t\t" + str(is_OK))
-    status = {"connection": r["return_code"], "query": is_OK}
-    return status
-
 def query_dno(dno_url):
 
     is_OK = 1 # 0 is no data, 1 is query failed and 2 is query succeeded
