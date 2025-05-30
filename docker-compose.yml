@@ -54,7 +54,7 @@ services:
     profiles:
     - production
 
-  server:
+  dando-dao:
     build:
       context: ./
     ports:

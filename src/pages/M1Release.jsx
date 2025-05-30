@@ -1,6 +1,10 @@
 import Footer from '../components/Footer';
+import { graphqlQuery } from '../components/Utility';
 
 const M1Release = () => {
+
+
+
 
   return (
     <>
@@ -11,7 +15,7 @@ const M1Release = () => {
         <div className="container-fluid m-0">
           <div className="row gap-3">
             <div className="card mb-3 p-3 w-auto bg-secondary border-0 rounded-0" >
-              <h4><b>ADA 0.00</b></h4>
+              <h4><b>ADA {balanceM1.toFixed(2)}</b></h4>
               to be distributed in next batch.
             </div>
             Completed

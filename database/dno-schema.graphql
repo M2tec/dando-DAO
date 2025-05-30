@@ -45,3 +45,8 @@ enum Subnet {
   MIDNIGHT
 }
 
+type Balance {
+  id: ID!
+  milestone: Int @id
+  value: Float
+}

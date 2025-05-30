@@ -59,7 +59,7 @@ def graphql_query(database_url, query, variables="{}"):
     # print("Returncode: " + str(return_code))
     return return_value
 
-def query_dno(dno_url):
+def query_dno_old(dno_url):
 
     is_OK = 1 # 0 is no data, 1 is query failed and 2 is query succeeded
 
@@ -99,6 +99,35 @@ def query_dno(dno_url):
     # koios   
     # logger.info(dno_url + "\t\t" + str(is_OK))
     status = {"connection": r["return_code"], "query": is_OK}
+    return status
+
+def query_dno(dno_url):
+
+    is_OK = 1 # 0 is no data, 1 is query failed and 2 is query succeeded
+    status_code = 0
+
+    dno_url = dno_url.removesuffix('/') + "/stats" 
+
+    print(dno_url) 
+    # GraphQL
+    try:
+        dno_status = requests.get(dno_url, timeout=2)
+
+        status_code = dno_status.status_code
+
+        if status_code == 200:
+            print(2)
+            is_OK = 2
+        else:
+            print(1)
+
+    except requests.exceptions.ConnectionError as e:
+        logger.info("Stats page: Connection error: " + str(e))
+    except requests.exceptions.ReadTimeout as e:
+        logger.info("Stats page: Timeout error: " + str(e))
+
+    status = {"connection": status_code, "query": is_OK}
+    print(status)
     return status
 
 def get_dno_data(governance_url, month):

@@ -10,6 +10,7 @@ COPY ./monitor.py ./
 RUN mkdir -p /logs/monitor
 
 RUN echo '0 6 * * * /monitor.py > /tmp/monitor.log' >> /crontab 
+RUN echo '0 5 * * * /balance.py > /tmp/balance.log' >> /crontab 
 
 CMD [ "/usr/bin/supercronic", "/crontab" ]
 
