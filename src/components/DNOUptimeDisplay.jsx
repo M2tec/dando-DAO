@@ -7,7 +7,7 @@ function getMonth(negativOffset) {
     const now = new Date();
     const fiveMonthsAgo = new Date();
     fiveMonthsAgo.setMonth(now.getMonth() - negativOffset);
-    
+
     const month = fiveMonthsAgo.getMonth() + 1;
     return month
 }
@@ -24,7 +24,7 @@ console.log(monthMin2)
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
-  ];
+];
 
 const DNOUptimeDisplay = () => {
     const [dnoData, setDnoData] = useState({})
@@ -42,7 +42,7 @@ const DNOUptimeDisplay = () => {
                     hardware
                     services {
                         subnet
-                        uptime(filter: {month: {in: [${monthMin2 }, ${monthMin1}, ${thisMonth }]}}) {
+                        uptime(filter: {month: {in: [${monthMin2}, ${monthMin1}, ${thisMonth}]}}) {
                             month
                             days
                         }
@@ -59,39 +59,21 @@ const DNOUptimeDisplay = () => {
             .catch(console.error);
     }, []);
 
-     const ProcessMonth = ( {uptimeData }) => [...uptimeData].map((item, index) => {
-        
-        if (item == 2) {
-            return (
-                <div key={index} className="col p-0 m-0">
-                    <div className='bg-success m-0 p-0'><br /></div>
+    const ProcessMonth = ({ uptimeData }) => [...uptimeData].map((item, index) => {
+        return (
+            <div key={index} className="col m-0 p-0">
+                <div className={`m-0 p-0 ${item == 2 ? 'bg-success' : item == 1 ? 'bg-secondary' : 'bg-white'}`}>
+                   <br />
                 </div>
-            )
-
-        } else if (item == 1) {
-            return (
-                <div key={index} className="col m-0 p-0">
-                    <div className='bg-secondary m-0 p-0'><br /></div>
-                </div>
-            )
-        } else {
-            return (
-                <div key={index} className="col m-0 p-0">
-                    <div className='bg-white m-0 p-0'><br /></div>
-                </div>
-            )
-        }
+            </div>
+        );
     }
     );
 
 
     function DnoListData(props) {
 
-        if (isEmpty(dnoData)) {
-            return (<></>)
-        }
-
-      // console.log("Props", props)
+        // console.log("Props", props)
         let dnoList = props.dnoData
         // console.log("dnoList", dnoList)
 
@@ -117,70 +99,72 @@ const DNOUptimeDisplay = () => {
 
                 uptimes.forEach(uptime => {
                     // console.log(uptime.month)
-                    
-                    uptime1[uptime.month] = uptime.days 
-                    uptimeData[subnet]= {...uptime1}
-                    
+
+                    uptime1[uptime.month] = uptime.days
+                    uptimeData[subnet] = { ...uptime1 }
+
                 });
             })
-            
+
             // console.log("uptimeData" , uptimeData["MAINNET"][1])
 
-                      
             return (
                 <div key={index} className='row m-0 mb-2'>
                     <div className='col-3 px-0'>
                         <div className='d-flex justify-content-between'>
                             <div className='mt-1'>{dno.name}</div>
+                            
                         </div>
-                    </div>                    
+                    </div>
+                    
                     <div className='col-3 px-1'>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden h-progressbar rounded-top border border-bottom-0 border-secondary">
-                           <div style={{height: "18px"}} className='d-flex align-items-end p-0 px-2'>m</div>
-                           <ProcessMonth
+                       
+                        <div style={{ height: "25px" }} className="row m-0 overflow-hidden h-progressbar rounded-top border border-bottom-0 border-secondary">
+                            <div className="col-2 p-0 px-1">m</div>
+                            <ProcessMonth
                                 uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][monthMin2] : "0"}
-                                 />
+                            />
                         </div>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
-                        <div style={{height: "18px"}} className='d-flex align-items-end px-2'>p</div>
-                           <ProcessMonth
+                               
+                        <div style={{ height: "25px" }} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
+                            <div className="col-2 p-0 px-1">p</div>
+                            <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][monthMin2] : "0"}
-                                 />
+                            />
                         </div>
                     </div>
                     <div className='col-3 px-1'>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
+                        <div style={{ height: "25px" }} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
 
-                           <ProcessMonth
+                            <ProcessMonth
                                 uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][monthMin1] : "0"}
-                                 />
+                            />
                         </div>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
- 
-                           <ProcessMonth
+                        <div style={{ height: "25px" }} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
+
+                            <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][monthMin1] : "0"}
-                                 />
+                            />
                         </div>
                     </div>
                     <div className='col-3 px-1'>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
- 
-                           <ProcessMonth
-                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth] : "0"}
-                                 />
-                        </div>
-                        <div style={{height: "18px"}} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
+                        <div style={{ height: "25px" }} className="row m-0 overflow-hidden rounded-top border border-bottom-0 border-secondary">
 
-                           <ProcessMonth
+                            <ProcessMonth
+                                uptimeData={uptimeData["MAINNET"] ? uptimeData["MAINNET"][thisMonth] : "0"}
+                            />
+                        </div>
+                        <div style={{ height: "25px" }} className="row m-0 overflow-hidden rounded-bottom border border-secondary">
+
+                            <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][thisMonth] : "0"}
-                                 />
+                            />
                         </div>
                     </div>
                 </div>
             )
 
         })
-        // console.log(DnoItems)
 
         return (
             <>
@@ -192,7 +176,7 @@ const DNOUptimeDisplay = () => {
 
     return (
         <>
-         <div className='container-fluid p-0 m-0'>
+            <div className='container-fluid p-0 m-0'>
                 <div className='row m-0'>
                     <div className='col-2 m-0 p-0'>
                         <b>DNO</b>
@@ -201,13 +185,13 @@ const DNOUptimeDisplay = () => {
 
                     </div>
                     <div className='col-3 m-0 px-1'>
-                        <b>{monthNames[monthMin2 -1]}</b>
+                        <b>{monthNames[monthMin2 - 1]}</b>
                     </div>
                     <div className='col-3 m-0 px-1'>
-                        <b>{monthNames[monthMin1 -1]}</b>
+                        <b>{monthNames[monthMin1 - 1]}</b>
                     </div>
                     <div className='col-3 m-0 px-1'>
-                        <b>{monthNames[thisMonth -1]}</b>
+                        <b>{monthNames[thisMonth - 1]}</b>
                     </div>
                 </div>
 
