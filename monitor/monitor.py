@@ -33,7 +33,7 @@ def graphql_query(database_url, query, variables="{}"):
     return_data = ""
     return_code = ""
     try:
-        r = requests.post(database_url, json=myjson, timeout=2)
+        r = requests.post(database_url, json=myjson, timeout=10)
         logger.debug("Status: " + repr(r.status_code))
         logger.debug("graphql_query: " + r.text)
         return_code = r.status_code
