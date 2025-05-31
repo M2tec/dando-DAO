@@ -3,56 +3,9 @@ import Footer from '../components/Footer';
 import { graphqlQuery, useDebounce } from '../components/Utility';
 import { ToastContainer, toast } from 'react-toastify';
 
-const Settings = () => {
-  const [walletAddress, setWalletAddress] = useState("")
-  const [userDefaultData, setUserDefaultData] = useState({ "name": "", "services": [{ "url": "" }, { "url": "" }] })
+async function setupNewUser(walletAddress) {
 
-  useEffect(() => {
-    console.log("Userdata", userDefaultData.name)
-    let myAddress = JSON.parse(localStorage.getItem("login_0"));
-
-    if (myAddress === null) {
-      myAddress = ""
-    }
-
-    setWalletAddress(myAddress)
-
-    window.addEventListener('storage', () => {
-      console.log("StorageEvent")
-      setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
-    });
-
-
-  }, []);
-
-
-  useEffect(() => {
-
-    const fetchData = async () => {
-
-      let gq = `query GetDno($preprodWallet: String!) {
-        getDno(preprodWallet: $preprodWallet) {
-          name
-          preprodWallet
-          mainnetWallet
-          hardware
-          services {
-            subnet
-            url
-          }
-        }
-      }`
-
-      let gqlData = await graphqlQuery(gq,
-        {
-          "preprodWallet": walletAddress
-        })
-
-      // Setup database fields when the address is not yet in the database
-      if (gqlData.data.getDno === null) {
-        console.log("No database object yet")
-
-        gq = `
+        let gq = `
           mutation AddDno($walletAddress: String!) {
             addDno(
               input: [{
@@ -94,21 +47,86 @@ const Settings = () => {
               }
             }
           }
+        `
 
-      `
+        let variables = {
+                           "preprodWallet": walletAddress
+                        }
 
         console.log(gq)
-        const fetchData = async () => {
-          await graphqlQuery(gq,
-            {
-              "preprodWallet": walletAddress
-            })
-        }
+        const fetchData = async () => { await graphqlQuery(gq,variables) }
 
         fetchData()
           .catch(console.error);
-      }
+}
 
+async function getUserData(walletAddress) {
+  let gq = `
+    query GetDno($preprodWallet: String!) {
+      getDno(preprodWallet: $preprodWallet) {
+        name
+        preprodWallet
+        mainnetWallet
+        hardware
+        services {
+          subnet
+          url
+        }
+      }
+    }`;
+
+  let variables = {
+    preprodWallet: walletAddress,
+  };
+
+  try {
+    let gqlData = await graphqlQuery(gq, variables);
+    return gqlData;
+  } catch (error) {
+    console.error(error);
+    throw error; // rethrow if you want caller to handle it
+  }
+}
+
+
+const Settings = () => {
+  const [walletAddress, setWalletAddress] = useState("")
+  const [userDefaultData, setUserDefaultData] = useState({ "name": "", "services": [{ "url": "" }, { "url": "" }] })
+
+  useEffect(() => {
+    console.log("Userdata", userDefaultData.name)
+    let myAddress = JSON.parse(localStorage.getItem("login_0"));
+
+    if (myAddress === null) {
+      myAddress = ""
+    }
+
+    setWalletAddress(myAddress)
+
+    window.addEventListener('storage', () => {
+      console.log("StorageEvent")
+      setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
+    });
+
+
+  }, []);
+
+
+  useEffect(() => {
+
+      getUserData(walletAddress)
+      .then(data => {
+        console.log("User data:", data);
+
+        if (gqlData.data.getDno === null) {
+          console.log("No database object yet")
+          setupNewUser(walletAddress)
+        }
+
+      })
+      .catch(error => {
+        console.error("Error fetching user data:", error);
+      });
 
       // console.log(gqlData)
       let dData = gqlData.data.getDno;
@@ -143,7 +161,7 @@ const Settings = () => {
     }
   }, [walletAddress])
 
-  function myQuery(address, field, value) {
+  function updateUserData(address, field, value) {
     console.log(address)
     console.log(field)
     console.log(value)
@@ -254,7 +272,7 @@ const Settings = () => {
 
     const debouncedRequest = useDebounce(() => {
       console.log("props", props)
-      myQuery(walletAddress, props.field, value)
+      updateUserData(walletAddress, props.field, value)
       toast.success('Saved!', {
         position: "top-center",
         autoClose: 1500,

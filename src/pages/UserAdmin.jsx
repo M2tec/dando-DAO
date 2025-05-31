@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Footer from '../components/Footer';
 import { graphqlQuery, isEmpty, handleGC } from '../components/Utility';
 import AdminMenu from '../components/AdminMenu';
 
