@@ -192,12 +192,12 @@ const UserAdmin = () => {
       return (
         <div key={index} className='row m-0 mb-2'>
           <div className='col-3 mt-4 px-0'>
-            {dno.name}
+            {dno?.name && <>{dno.name}</>}
           </div>
 
           <div className='col-5 mt-4 px-0'>
-            {dno.services[0].url} <br />
-            {dno.services[1].url}
+            {dno.services?.[0]?.url && <>{dno.services[0].url}<br /></>}
+            {dno.services?.[1]?.url && <>{dno.services[1].url}</>}
           </div>
 
           <div className='col-2 px-0'>
