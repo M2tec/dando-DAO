@@ -122,7 +122,7 @@ const PaymentAdmin = () => {
   }
 
   function distributeFunds(network) {
-    console.log("data: " , network)
+    console.log("data: ", network)
 
     if (network == "mainnet") {
       let wallet = ""
@@ -149,31 +149,10 @@ const PaymentAdmin = () => {
       ]
     }
 
-
     for (let index = 0; index < dnoData.length; index++) {
 
-      let build_tx = {
-        type: "buildTx",
-        title: "Payment",
-        description: "",
-        tx: {
-          outputs: [
-            {
-              address: "",
-              assets: [
-                {
-                  policyId: "ada",
-                  assetName: "ada",
-                  quantity: "0"
-                }
-              ]
-            }
-          ]
-        }
-      }
-
       let value_id = "value-" + network + "-" + index
-      console.log("value_id" , value_id)
+      console.log("value_id", value_id)
       let valueElement = document.getElementById(value_id)
       // console.log("----")
       // console.log("D:", dnoData[index].name);
@@ -181,16 +160,45 @@ const PaymentAdmin = () => {
       console.log("E:", valueElement)
       console.log("V:", valueElement.value)
 
-      build_tx.description = `DNO distribution, thank you ${dnoData[index].name} for you services`
-      build_tx.tx.outputs[0].address = dnoData[index].preprodWallet
-      build_tx.tx.outputs[0].assets[0].quantity = valueElement.value
+      if (valueElement.value != 0) {
+        let build_tx = {
+          type: "buildTx",
+          title: "Payment",
+          description: "",
+          tx: {
+            outputs: [
+              {
+                address: "",
+                assets: [
+                  {
+                    policyId: "ada",
+                    assetName: "ada",
+                    quantity: "0"
+                  }
+                ]
+              }
+            ]
+          }
+        }
 
-      let buildTxName = "build_tx_" + index
+        build_tx.description = `DNO distribution, thank you ${dnoData[index].name} for you services`
 
-      gcscript.run[buildTxName] = build_tx
-      signTx.txs.push(`{get('cache.${buildTxName}.txHex')}`)
+        if (network == "mainnet") {
+          build_tx.tx.outputs[0].address = dnoData[index].mainnetWallet
+        } else {
+          build_tx.tx.outputs[0].address = dnoData[index].preprodWallet
+        }
+
+        build_tx.tx.outputs[0].assets[0].quantity = valueElement.value * 1000000
+
+        let buildTxName = "build_tx_" + index
+
+        gcscript.run[buildTxName] = build_tx
+        signTx.txs.push(`{get('cache.${buildTxName}.txHex')}`)
+      }
 
     }
+
     console.log(gcscript)
 
     gcscript.run["sign_tx"] = signTx
