@@ -52,7 +52,7 @@ services:
     volumes:
     - ./logs/monitor/:/logs/monitor/
     profiles:
-    - production
+    - monitor
 
   dando-dao:
     build:
