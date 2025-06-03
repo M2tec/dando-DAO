@@ -58,7 +58,7 @@ services:
     build:
       context: ./
     ports:
-    - "28880:80"
+    - "28888:80"
     volumes:
     - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro      
     restart: always
