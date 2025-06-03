@@ -64,12 +64,15 @@ def query_dno(dno_url):
     is_OK = 1 # 0 is no data, 1 is query failed and 2 is query succeeded
     status_code = 0
 
-    dno_url = dno_url.removesuffix('/') + "/stats" 
+    # dno_url = dno_url.removesuffix('/') + "/stats"  # Only works from python 3.9 
+    if dno_url.endswith('/'):
+        dno_url = dno_url[:-1]
+    dno_url += "/stats"
 
     print(dno_url) 
     # GraphQL
     try:
-        dno_status = requests.get(dno_url, timeout=2)
+        dno_status = requests.get(dno_url, timeout=10)
 
         status_code = dno_status.status_code
 

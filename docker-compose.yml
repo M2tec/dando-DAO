@@ -4,8 +4,8 @@ services:
     volumes:
     - ./data:/dgraph
     ports:
-    - 35080:5080
-    - 36080:6080
+    - 25080:5080
+    - 26080:6080
     restart: on-failure
     command: dgraph zero --my=zero:5080
     profiles:
@@ -18,8 +18,8 @@ services:
     volumes:
       - ./data:/dgraph
     ports:
-    - 38080:8080
-    - 39080:9080
+    - 28080:8080
+    - 29080:9080
     restart: on-failure
     command: dgraph alpha --my=alpha:7080 --zero=zero:5080 --security whitelist=0.0.0.0/0
     profiles:
@@ -37,7 +37,7 @@ services:
     build:
       context: ./graphiql_playground
     ports:
-    - 34080:80
+    - 24080:80
     volumes:
     - ./config/graphiql-playground/default.conf:/etc/nginx/conf.d/default.conf:ro            
     profiles:
@@ -58,7 +58,7 @@ services:
     build:
       context: ./
     ports:
-    - "38880:80"
+    - "28880:80"
     volumes:
     - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro      
     restart: always
