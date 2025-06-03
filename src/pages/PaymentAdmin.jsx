@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import { graphqlQuery, isEmpty, handleGC } from '../components/Utility';
 import AdminMenu from '../components/AdminMenu';
-
+import { Bullseye } from 'react-bootstrap-icons';
 
 const PaymentAdmin = () => {
 
@@ -70,7 +70,7 @@ const PaymentAdmin = () => {
             </div>
 
             <div className='col-3 px-0 pt-1'>
-              {dno.preprodWallet.slice(0, 12) + "..." + dno.preprodWallet.slice(-12)}
+              {dno?.preprodWallet && <>{dno.preprodWallet.slice(0, 12) + "..." + dno.preprodWallet.slice(-12)}</>}
             </div>
 
             <div className='col-1 px-0 mx-3'>
@@ -92,7 +92,7 @@ const PaymentAdmin = () => {
             </div>
 
             <div className='col-3 px-0 pt-1'>
-              {dno.mainnetWallet.slice(0, 12) + "..." + dno.mainnetWallet.slice(-12)}
+              {dno?.mainnetWallet && <>{dno.mainnetWallet.slice(0, 12) + "..." + dno.mainnetWallet.slice(-12)}</>}
             </div>
 
             <div className='col-1 px-0 mx-3'>
@@ -145,9 +145,11 @@ const PaymentAdmin = () => {
     let signTx = {
       type: "signTxs",
       detailedPermissions: false,
-      txs: [
+      txs: ["{get('cache.build_tx.txHex')}"
       ]
     }
+
+    let outputArray = []
 
     for (let index = 0; index < dnoData.length; index++) {
 
@@ -160,13 +162,10 @@ const PaymentAdmin = () => {
       console.log("E:", valueElement)
       console.log("V:", valueElement.value)
 
+      
+      
       if (valueElement.value != 0) {
-        let build_tx = {
-          type: "buildTx",
-          title: "Payment",
-          description: "",
-          tx: {
-            outputs: [
+        let output = 
               {
                 address: "",
                 assets: [
@@ -177,27 +176,31 @@ const PaymentAdmin = () => {
                   }
                 ]
               }
-            ]
-          }
-        }
-
-        build_tx.description = `DNO distribution, thank you ${dnoData[index].name} for you services`
-
+            
         if (network == "mainnet") {
-          build_tx.tx.outputs[0].address = dnoData[index].mainnetWallet
+          output.address = dnoData[index].mainnetWallet
         } else {
-          build_tx.tx.outputs[0].address = dnoData[index].preprodWallet
+          outpus.address = dnoData[index].preprodWallet
         }
 
-        build_tx.tx.outputs[0].assets[0].quantity = valueElement.value * 1000000
+        output.assets[0].quantity = (valueElement.value * 1000000).toString();
 
-        let buildTxName = "build_tx_" + index
-
-        gcscript.run[buildTxName] = build_tx
-        signTx.txs.push(`{get('cache.${buildTxName}.txHex')}`)
+        outputArray.push(output)
+        
       }
 
     }
+
+    let build_tx = {
+      type: "buildTx",
+      title: "Payment",
+      description: "DNO distribution, thank you for you services",
+      tx: {
+        outputs: outputArray
+      }
+    }
+
+    gcscript.run["build_tx"] = build_tx
 
     console.log(gcscript)
 

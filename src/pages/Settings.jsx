@@ -3,6 +3,63 @@ import Footer from '../components/Footer';
 import { graphqlQuery, useDebounce } from '../components/Utility';
 import { ToastContainer, toast } from 'react-toastify';
 
+async function setupNewUser(walletAddress) {
+
+        let gq = `
+          mutation AddDno($preprodWallet: String!) {
+            addDno(
+              input: [{
+                name: "", 
+                mainnetWallet: "", 
+                preprodWallet: $preprodWallet, 
+                hardware: "", 
+                services: [
+                  { 
+                    network: CARDANO, 
+                    subnet: PREPROD, 
+                    tag: GENERIC, 
+                    url: "", 
+                    uptime: [
+                      {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
+                      {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
+                      {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
+                    ]
+                  },
+                  { 
+                    network: CARDANO, 
+                    subnet: MAINNET, 
+                    tag: GENERIC, 
+                    url: "", 
+                    uptime: [
+                      {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
+                      {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
+                      {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
+                    ]
+                  }
+                ]
+              }],
+              upsert: true
+            ) {
+              dno {
+                id
+                name
+                preprodWallet
+              }
+            }
+          }
+        `
+
+        let variables = {
+                           "preprodWallet": walletAddress
+                        }
+
+        console.log(gq)
+        const fetchData = async () => { await graphqlQuery(gq,variables) }
+
+        fetchData()
+          .catch(console.error);
+}
+
 const Settings = () => {
   const [walletAddress, setWalletAddress] = useState("")
   const [userDefaultData, setUserDefaultData] = useState({ "name": "", "services": [{ "url": "" }, { "url": "" }] })
@@ -51,62 +108,65 @@ const Settings = () => {
       // Setup database fields when the address is not yet in the database
       if (gqlData.data.getDno === null) {
         console.log("No database object yet")
+        
+        setupNewUser(walletAddress)
+      
+        //   gq = `
+      //     mutation AddDno($preprodWallet: String!) {
+      //       addDno(
+      //         input: [{
+      //           name: "", 
+      //           mainnetWallet: "", 
+      //           preprodWallet: $preprodWallet, 
+      //           hardware: "", 
+      //           services: [
+      //             { 
+      //               network: CARDANO, 
+      //               subnet: PREPROD, 
+      //               tag: GENERIC, 
+      //               url: "", 
+      //               uptime: [
+      //                 {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
+      //                 {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
+      //                 {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
+      //               ]
+      //             },
+      //             { 
+      //               network: CARDANO, 
+      //               subnet: MAINNET, 
+      //               tag: GENERIC, 
+      //               url: "", 
+      //               uptime: [
+      //                 {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
+      //                 {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
+      //                 {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
+      //               ]
+      //             }
+      //           ]
+      //         }],
+      //         upsert: true
+      //       ) {
+      //         dno {
+      //           id
+      //           name
+      //           preprodWallet
+      //         }
+      //       }
+      //     }
 
-        gq = `
-          mutation AddDno($walletAddress: String!) {
-            addDno(
-              input: [{
-                name: "", 
-                mainnetWallet: "", 
-                preprodWallet: $walletAddress, 
-                hardware: "", 
-                services: [
-                  { 
-                    network: CARDANO, 
-                    subnet: PREPROD, 
-                    tag: GENERIC, 
-                    url: "", 
-                    uptime: [
-                      {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
-                      {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
-                      {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
-                    ]
-                  },
-                  { 
-                    network: CARDANO, 
-                    subnet: MAINNET, 
-                    tag: GENERIC, 
-                    url: "", 
-                    uptime: [
-                      {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
-                      {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
-                      {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
-                    ]
-                  }
-                ]
-              }],
-              upsert: true
-            ) {
-              dno {
-                id
-                name
-                preprodWallet
-              }
-            }
-          }
+      // `
 
-      `
+      //   console.log(gq)
+      //   const fetchData = async () => {
+      //     await graphqlQuery(gq,
+      //       {
+      //         "preprodWallet": walletAddress
+      //       })
+      //   }
 
-        console.log(gq)
-        const fetchData = async () => {
-          await graphqlQuery(gq,
-            {
-              "preprodWallet": walletAddress
-            })
-        }
+      //   fetchData()
+      //     .catch(console.error);
 
-        fetchData()
-          .catch(console.error);
       }
 
 

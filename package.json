@@ -8,7 +8,7 @@
     "down": "docker compose --profile dev down",
     "prod-down": "docker compose --profile production down",
     "up": "docker compose --profile dev up -d",
-    "prod-up-rebuild": "docker system prune -a && docker compose --profile production up -d --build",
+    "prod-up-rebuild": "docker compose --profile production up -d --build",
     "schema": "cd database && ./install-schema.py http://localhost:28080/admin dno-schema.graphql && cd ..",
     "deleteDb": "docker compose --profile dev down && sudo rm -rf data",
     "build": "vite build",
