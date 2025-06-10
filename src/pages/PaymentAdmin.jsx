@@ -74,7 +74,7 @@ const PaymentAdmin = () => {
             </div>
 
             <div className='col-1 px-0 mx-3'>
-              <input id={"value-preprod-" + index} type="text" className="form-control" defaultValue={index} />
+              <input id={"value-preprod-" + index} type="text" className="form-control" defaultValue="0" />
             </div>
 
             <div className='col-2'>
@@ -96,7 +96,7 @@ const PaymentAdmin = () => {
             </div>
 
             <div className='col-1 px-0 mx-3'>
-              <input id={"value-mainnet-" + index} type="text" className="form-control" defaultValue={index} />
+              <input id={"value-mainnet-" + index} type="text" className="form-control" defaultValue="0" />
             </div>
 
             <div className='col-2'>
