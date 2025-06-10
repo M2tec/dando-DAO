@@ -6,6 +6,7 @@ RUN apk add --no-cache  supercronic \
                         py3-requests
 
 COPY ./monitor.py ./
+COPY ./balance.py ./
 
 RUN mkdir -p /logs/monitor
 
