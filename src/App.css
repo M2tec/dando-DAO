@@ -49,3 +49,14 @@ footer {
 .read-the-docs {
   color: #888;
 }
+
+.footer-container {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 999;
+}
+
+.footer-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+}

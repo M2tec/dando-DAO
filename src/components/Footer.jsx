@@ -1,10 +1,21 @@
-// import { useSearchParams } from 'react-router-dom'
-// import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const Footer = () => {
 
+    const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setVisible(false);
+            console.log("Hide")
+        }, 5000); // Fade out after 5 seconds
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
-        <div className="p-5 h-25 fixed-bottom bg-primary text-white">
+         <div className={`footer-container ${visible ? 'visible' : 'hidden'}`}>
+         <div className="p-5 h-25 fixed-bottom bg-primary text-white">
 
             <div className="container">
                 <div className="row">
@@ -37,6 +48,7 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     )
 };
