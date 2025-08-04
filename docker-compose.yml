@@ -53,9 +53,9 @@ services:
     volumes:
     - ./logs/monitor/:/logs/monitor/
     profiles:
-    - monitor
+    - production
 
-  dando-dao:
+  server:
     image: m2tec/dando-dao-server
     build:
       context: ./
