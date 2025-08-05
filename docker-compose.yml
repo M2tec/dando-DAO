@@ -48,8 +48,8 @@ services:
     build:
       context: ./monitor
     environment:
-    - VITE_GRAPH_URL="https://dgraph.m2tec.nl/graphql"
-    - LOG_FOLDER="/logs/monitor/"
+    - VITE_GRAPH_URL=https://dgraph.m2tec.nl/graphql
+    - LOG_FOLDER=/logs/monitor/
     volumes:
     - ./logs/monitor/:/logs/monitor/
     profiles:
