@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import Footer from '../components/Footer';
 import { graphqlQuery, useDebounce } from '../components/Utility';
-import { ToastContainer, toast } from 'react-toastify';
 
-async function setupNewUser(walletAddress) {
+async function setupNewUser(preprodWallet) {
 
-        let gq = `
+  let gq = `
           mutation AddDno($preprodWallet: String!) {
             addDno(
               input: [{
@@ -16,7 +15,7 @@ async function setupNewUser(walletAddress) {
                 services: [
                   { 
                     network: CARDANO, 
-                    subnet: PREPROD, 
+                    subnet: "PREPROD", 
                     tag: GENERIC, 
                     url: "", 
                     uptime: [
@@ -27,7 +26,7 @@ async function setupNewUser(walletAddress) {
                   },
                   { 
                     network: CARDANO, 
-                    subnet: MAINNET, 
+                    subnet: "MAINNET", 
                     tag: GENERIC, 
                     url: "", 
                     uptime: [
@@ -49,301 +48,256 @@ async function setupNewUser(walletAddress) {
           }
         `
 
-        let variables = {
-                           "preprodWallet": walletAddress
-                        }
+  let variables = {
+    "preprodWallet": preprodWallet
+  }
 
-        console.log(gq)
-        const fetchData = async () => { await graphqlQuery(gq,variables) }
+  // console.log(gq)
+  const fetchData = async () => { await graphqlQuery(gq, variables) }
 
-        fetchData()
-          .catch(console.error);
+  fetchData()
+    .catch(console.error);
+}
+
+async function updateUser(userData) {
+
+  const fetchData = async () => {
+    let gq = `
+            mutation AddDno(  
+                          $preprodWallet: String!, 
+                          $mainnetWallet: String!,
+                          $name: String!, 
+                          $hardware: String!
+                          ) {
+              addDno(
+                input: [{
+                  name: $name, 
+                  mainnetWallet: $mainnetWallet, 
+                  preprodWallet: $preprodWallet, 
+                  hardware: $hardware
+                }],
+                upsert: true
+              ) {
+                dno {
+                  id
+                  name
+                  preprodWallet
+                  services {
+                    id
+                    subnet
+                  }
+                }
+              }
+            }
+          `
+
+    let variables = {
+      "preprodWallet": userData.preprodWallet,
+      "mainnetWallet": userData.mainnetWallet,
+      "name": userData.name,
+      "hardware": userData.hardware
+    }
+
+    let gqlQuery = await graphqlQuery(gq, variables)
+    return gqlQuery
+  }
+
+  fetchData().then((result) => {
+
+    let services = result.data.addDno.dno[0].services
+
+    let preprodService = services.filter(function (item) {
+      return item.subnet == "PREPROD";
+    })
+
+    let preprodServiceId = preprodService[0].id
+    console.log(preprodServiceId)
+
+    let gq = `
+      mutation UpdateService($serviceId: ID!, $value: String!) {
+        updateService(
+          input: {
+            filter: { id: [$serviceId] }, 
+            set: { url: $value }
+          }
+        ) {
+          service {
+            id
+            subnet
+            url
+          }
+        }
+      }
+    `
+
+    let variables = {
+      "serviceId": preprodServiceId,
+      "value": userData.preprodUrl
+    }
+
+    let fetchServiceData = async () => { await graphqlQuery(gq, variables) }
+    fetchServiceData()
+
+    let mainnetService = services.filter(function (item) {
+      return item.subnet == "MAINNET";
+    })
+
+    let mainnetServiceId = mainnetService[0].id
+    console.log(mainnetServiceId)
+
+    variables = {
+      "serviceId": mainnetServiceId,
+      "value": userData.mainnetUrl
+    }
+
+    fetchServiceData()
+  }
+  )
+
+  fetchData()
+    .catch(console.error);
 }
 
 const Settings = () => {
-  const [walletAddress, setWalletAddress] = useState("")
-  const [userDefaultData, setUserDefaultData] = useState({ "name": "", "services": [{ "url": "" }, { "url": "" }] })
+  const [preprodWallet, setpreprodWallet] = useState("")
+  const [userData, setUserData] = useState({
+    "preprodWallet": "",
+    "mainnetWallet": "",
+    "name": "",
+    "hardware": "",
+    "preprodUrl": "",
+    "mainnetUrl": ""
+  })
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Userdata", userDefaultData.name)
+    // console.log("Userdata", userData.name)
+    // console.log("userData:", userData);
     let myAddress = JSON.parse(localStorage.getItem("login_0"));
 
     if (myAddress === null) {
       myAddress = ""
     }
 
-    setWalletAddress(myAddress)
+    setpreprodWallet(myAddress)
 
     window.addEventListener('storage', () => {
       console.log("StorageEvent")
-      setWalletAddress(JSON.parse(localStorage.getItem('login_0')) || {})
+      setpreprodWallet(JSON.parse(localStorage.getItem('login_0')) || {})
     });
 
 
   }, []);
 
-
+  // preprodWallet changed
   useEffect(() => {
+    console.log("Wallet", preprodWallet)
+
+    if (preprodWallet == "") {
+      return
+    }
 
     const fetchData = async () => {
 
-      let gq = `query GetDno($preprodWallet: String!) {
-        getDno(preprodWallet: $preprodWallet) {
-          name
-          preprodWallet
-          mainnetWallet
-          hardware
-          services {
-            subnet
-            url
-          }
-        }
-      }`
+      let gq = `
+query GetDno($preprodWallet: String!) {
+  getDno(preprodWallet: $preprodWallet) {
+    name
+    preprodWallet
+    mainnetWallet
+    hardware
+    services {
+      id
+      subnet
+      url
+    }
+  }
+}`
 
       let gqlData = await graphqlQuery(gq,
         {
-          "preprodWallet": walletAddress
+          "preprodWallet": preprodWallet
         })
 
+      return gqlData
+
+    }
+
+    fetchData().then((result) => {
+      console.log("Result: ", result)
+
       // Setup database fields when the address is not yet in the database
-      if (gqlData.data.getDno === null) {
+
+      let newdata = {}
+      let dData = result.data.getDno;
+
+      if (dData === null) {
         console.log("No database object yet")
-        
-        setupNewUser(walletAddress)
-      
-        //   gq = `
-      //     mutation AddDno($preprodWallet: String!) {
-      //       addDno(
-      //         input: [{
-      //           name: "", 
-      //           mainnetWallet: "", 
-      //           preprodWallet: $preprodWallet, 
-      //           hardware: "", 
-      //           services: [
-      //             { 
-      //               network: CARDANO, 
-      //               subnet: PREPROD, 
-      //               tag: GENERIC, 
-      //               url: "", 
-      //               uptime: [
-      //                 {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
-      //                 {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
-      //                 {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
-      //               ]
-      //             },
-      //             { 
-      //               network: CARDANO, 
-      //               subnet: MAINNET, 
-      //               tag: GENERIC, 
-      //               url: "", 
-      //               uptime: [
-      //                 {month: 1, days: "0"}, {month: 2, days: "0"}, {month: 3, days: "0"}, {month: 4, days: "0"},
-      //                 {month: 5, days: "0"}, {month: 6, days: "0"}, {month: 7, days: "0"}, {month: 8, days: "0"},
-      //                 {month: 9, days: "0"}, {month: 10, days: "0"}, {month: 11, days: "0"}, {month: 12, days: "0"}
-      //               ]
-      //             }
-      //           ]
-      //         }],
-      //         upsert: true
-      //       ) {
-      //         dno {
-      //           id
-      //           name
-      //           preprodWallet
-      //         }
-      //       }
-      //     }
 
-      // `
+        setupNewUser(preprodWallet)
 
-      //   console.log(gq)
-      //   const fetchData = async () => {
-      //     await graphqlQuery(gq,
-      //       {
-      //         "preprodWallet": walletAddress
-      //       })
-      //   }
+        newdata = {
+          name: "",
+          mainnetWallet: "",
+          preprodWallet: preprodWallet,
+          hardware: "",
+          preprodUrl: "",
+          mainnetUrl: ""
+        }
 
-      //   fetchData()
-      //     .catch(console.error);
+      } else {
 
-      }
+        let preprodService = dData.services.filter(function (item) {
+          return item.subnet == "PREPROD";
+        })
 
+        let mainnetService = dData.services.filter(function (item) {
+          return item.subnet == "MAINNET";
+        })
 
-      // console.log(gqlData)
-      let dData = gqlData.data.getDno;
-      // console.log("dData", dData)
-      if (dData !== null) {
-        console.log("dData", dData)
-
-        let services = {}
-        services[dData.services[0].subnet] = dData.services[0].url
-        services[dData.services[1].subnet] = dData.services[1].url
-
-        console.log("services", services)
-        let newdata = {
+        newdata = {
           name: dData.name,
           mainnetWallet: dData.mainnetWallet,
           preprodWallet: dData.preprodWallet,
           hardware: dData.hardware,
-          preprodUrl: services["PREPROD"],
-          mainnetUrl: services["MAINNET"]
+          preprodUrl: preprodService[0].url,
+          mainnetUrl: mainnetService[0].url
         }
 
-        console.log(newdata)
-        setUserDefaultData(newdata);
+
       }
-    }
+      setUserData(newdata);
+      setLoading(false);
+    })
 
-    console.log("wallet", walletAddress)
-    if (walletAddress != "") {
-
-      fetchData()
-        .catch(console.error);
-    }
-  }, [walletAddress])
-
-  function myQuery(address, field, value) {
-    console.log(address)
-    console.log(field)
-    console.log(value)
-
-    let gq = ""
-
-    console.log("Address: ", address)
-    if (field == "PREPROD" || field == "MAINNET") {
-
-      gq = `
-      { 
-          queryDno(filter: {preprodWallet: {eq: "` + address + `" }})
-              {
-              name 
-              preprodWallet
-              services(filter: {subnet: {eq: ` + field + ` }}){
-                id
-                url
-              }
-          }
-      } 
-      `
-   
-
-      async function f() {
-
-        try {
-          let response = await graphqlQuery(gq)
-
-          console.log("response: ", response)
-          let serviceId = response.data.queryDno[0].services[0].id
-
-          console.log("serviceId: ", serviceId)
-
-          gq = `
-            mutation UpdateService($serviceId: ID!, $value: String!) {
-              updateService(
-                input: {
-                  filter: { id: [$serviceId] }, 
-                  set: { url: $value }
-                }
-              ) {
-                service {
-                  subnet
-                  network
-                  id
-                  tag
-                }
-              }
-            }
-          `
-          response = await graphqlQuery(gq,
-            {
-              "serviceId": serviceId,
-              "value": value
-            }
-          )
-          console.log(response)
-
-
-
-        } catch (err) {
-          // catches errors both in fetch and response.json
-          alert(err);
-        }
-      }
-
-      f();
-    } else {
-
-      gq = `
-        mutation { addDno(input: [
-        {    
-        preprodWallet: "` + address + `",
-        ` + field + `: "` + value + `"
-        }], upsert: true)
-        {
-            dno {
-            id
-            name
-            preprodWallet            
-            }
-        }
-        }
-    `
-      async function f() {
-
-        try {
-          let response = await graphqlQuery(gq)
-          console.log(response)
-
-        } catch (err) {
-          // catches errors both in fetch and response.json
-          alert(err);
-        }
-      }
-
-      f();
-
-
-    }
-
-
-  }
-
-  const Input = (props) => {
-    const [value, setValue] = useState();
-
-    const debouncedRequest = useDebounce(() => {
-      console.log("props", props)
-      myQuery(walletAddress, props.field, value)
-      toast.success('Saved!', {
-        position: "top-center",
-        autoClose: 1500,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-
-      // access to latest state here
+    fetchData()
+        .catch(err => {
+          console.error(err);
     });
+    
+  }, [preprodWallet])
 
-    const onChange = (e) => {
-      const value = e.target.value;
-      setValue(value);
 
-      debouncedRequest();
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    updateUser(userData);
+  };
 
-    return <input type="text" className="form-control" onChange={onChange} defaultValue={props.defaultValue} />;
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUserData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
+  };
+
+  if (loading) return <p className='mx-4 mt-2'>Loading...</p>;
 
   return (
     <>
       <div className="m-3">
-        <ToastContainer />
+
         <h1 className="text-3xl font-bold mb-0"><b>Settings</b></h1>
         <p>Add you DNO info for rewards</p>
 
@@ -356,34 +310,32 @@ const Settings = () => {
 
             <div className="">
               <h2> Cardano Address</h2>
-              {walletAddress}
+              {preprodWallet}
             </div>
 
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="form-group mb-2">
                 <label htmlFor="dnoFormControlInput1">Name</label>
 
-                <Input
+                <input
                   type="text"
-                  walletAddress={walletAddress}
-                  field="name"
+                  name="name"
                   className="form-control"
                   id="dnoFormControlInput1"
-                  placeholder="Nike Hoskinson"
-                  defaultValue={userDefaultData.name} />
+                  onChange={(e) => handleChange(e)}
+                  defaultValue={userData.name} />
 
               </div>
               <div className="form-group mb-2">
                 <label htmlFor="dnoFormControlInput1">Mainnet wallet</label>
 
-                <Input
+                <input
                   type="text"
-                  walletAddress={walletAddress}
-                  field="mainnetWallet"
+                  name="mainnetWallet"
                   className="form-control"
-                  id="dnoFormControlInput1"
+                  onChange={(e) => handleChange(e)}
                   placeholder="https://server1.dandelion.link"
-                  defaultValue={userDefaultData.mainnetWallet}
+                  defaultValue={userData.mainnetWallet}
                 />
 
               </div>
@@ -391,14 +343,13 @@ const Settings = () => {
               <div className="form-group mb-2">
                 <label htmlFor="dnoFormControlInput1">Hardware</label>
 
-                <Input
+                <input
                   type="text"
-                  walletAddress={walletAddress}
-                  field="hardware"
+                  name="hardware"
                   className="form-control"
-                  id="dnoFormControlInput1"
+                  onChange={(e) => handleChange(e)}
                   placeholder="Atari"
-                  defaultValue={userDefaultData.hardware}
+                  defaultValue={userData.hardware}
                 />
 
               </div>
@@ -406,14 +357,13 @@ const Settings = () => {
               <div className="form-group mb-2">
                 <label htmlFor="dnoFormControlInput1">Node Url preprod</label>
 
-                <Input
+                <input
                   type="text"
-                  walletAddress={walletAddress}
-                  field="PREPROD"
+                  name="preprodUrl"
                   className="form-control"
-                  id="dnoFormControlInput1"
+                  onChange={(e) => handleChange(e)}
                   placeholder="https://preprod.dandelion.link"
-                  defaultValue={userDefaultData.preprodUrl}
+                  defaultValue={userData.preprodUrl}
                 />
 
               </div>
@@ -421,17 +371,17 @@ const Settings = () => {
               <div className="form-group mb-2">
                 <label htmlFor="dno\FormControlInput1">Node Url mainnet</label>
 
-                <Input
+                <input
                   type="text"
-                  walletAddress={walletAddress}
-                  field="MAINNET"
+                  name="mainnetUrl"
                   className="form-control"
-                  id="dnoFormControlInput1"
+                  onChange={(e) => handleChange(e)}
                   placeholder="https://mainnet.dandelion.link"
-                  defaultValue={userDefaultData.mainnetUrl}
+                  defaultValue={userData.mainnetUrl}
                 />
 
               </div>
+              <button type="submit" className="btn btn-primary px-5 mt-3" role="button">Save</button>
 
             </form>
 

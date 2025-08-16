@@ -29,12 +29,12 @@ export function isEmpty(obj) {
 
 export async function graphqlQuery(gq, variables={}) {
     console.log("API URL: ", graphUrl)
-    console.log(gq)
-    console.log(variables)
+    console.log("GraphQL query: \n-------------------------------", gq)
+    console.log("Variables: \n-------------------------------\n",JSON.stringify(variables, null, 2))
 
     // let gquery = { query: gq.replace(/\n/g, ' '), variables: variables };
     let gquery = { query: gq, variables: variables };
-    console.log("gquery: ", gquery)
+    // console.log("gquery: ", gquery)
     try {
         const response = await fetch(graphUrl,
             {
@@ -55,7 +55,7 @@ export async function graphqlQuery(gq, variables={}) {
             console.log("GQL query error: \n" + gqlData["errors"][0]['message'])
 
         } else {
-            console.log(gqlData)
+            console.log("Return data: \n-------------------------------\n",JSON.stringify(gqlData.data, null, 2) )
         }
 
 

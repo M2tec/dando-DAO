@@ -84,7 +84,6 @@ const DNOUptimeDisplay = () => {
         const DnoItems = dnoList.map((dno, index) => // { console.log("dno", dno.uptimes.uptimeData[0])}
         {
 
-            // Reorder graphQuery, feels like a hack
             //  console.log("dno", dno)
             let services = dno.services
 
@@ -131,6 +130,7 @@ const DNOUptimeDisplay = () => {
                             <ProcessMonth
                                 uptimeData={uptimeData["PREPROD"] ? uptimeData["PREPROD"][monthMin2] : "0"}
                             />
+                            
                         </div>
                     </div>
                     <div className='col-3 px-1'>

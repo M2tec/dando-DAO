@@ -9,12 +9,12 @@ type Dno {
 
 type Service {
   id: ID!
-  subnet: Subnet! @search
+  subnet: String! @search @id
   network: Network! @search
   tag: Tag!  @search
   url: String
   uptime: [Uptime] @hasInverse(field: service )
-  dno: [Dno!] 
+  dno: Dno! 
 }
 
 type Uptime {
@@ -34,14 +34,6 @@ enum Tag {
 
 enum Network {
   CARDANO
-  MIDNIGHT
-}
-
-enum Subnet {
-  PREPROD
-  PREVIEW
-  MAINNET
-  SANCHONET
   MIDNIGHT
 }
 
