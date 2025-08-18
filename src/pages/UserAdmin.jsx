@@ -85,11 +85,11 @@ const UserAdmin = () => {
         "MIDNIGHT",
 
         // enum Subnet {
-        "PREPROD",
-        "PREVIEW",
-        "MAINNET",
-        "SANCHONET",
-        "MIDNIGHT"
+        // "PREPROD",
+        // "PREVIEW",
+        // "MAINNET",
+        // "SANCHONET",
+        // "MIDNIGHT"
       ]
 
       function unquoteEnum(myData, enumFields, enumValues) {

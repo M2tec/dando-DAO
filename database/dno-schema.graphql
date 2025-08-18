@@ -9,7 +9,7 @@ type Dno {
 
 type Service {
   id: ID!
-  subnet: String! @search @id
+  subnet: String! @search
   network: Network! @search
   tag: Tag!  @search
   url: String
